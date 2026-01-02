@@ -7,13 +7,6 @@ export type MenuOption = {
   link: string;
 };
 
-export type Stepper = {
-  currentStep: number;
-  totalSteps: number;
-};
-
 export interface UISettings {
   menuOptions: MenuOption[];
-  isCreationalModeEnabled: boolean;
-  stepper: Stepper;
 }
