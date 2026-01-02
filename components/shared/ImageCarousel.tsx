@@ -1,0 +1,79 @@
+"use client"
+
+import Image from "next/image"
+import { useEffect, useState } from "react"
+
+const images = [
+  {
+    src: "/demos/realistic_1.png",
+    alt: "Elegant interior design",
+  },
+  {
+    src: "/demos/realistic_2.png",
+    alt: "Sophisticated workspace",
+  },
+  {
+    src: "/demos/realistic_3.png",
+    alt: "Peaceful environment",
+  },
+]
+
+export function ImageCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length)
+    }, 6000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="relative hidden lg:block overflow-hidden bg-primary">
+      {images.map((image, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            index === currentIndex ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Image
+            src={image.src || "/placeholder.svg"}
+            alt={image.alt}
+            fill
+            quality={90}
+            className="object-cover"
+            priority={index === 0}
+          />
+        </div>
+      ))}
+
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent" />
+
+      <div className="absolute bottom-0 left-0 right-0 p-12">
+        <h2 className="text-4xl font-serif text-primary-foreground mb-4 text-balance">
+        Crea ecografias hiperrealistas en segundos.
+        </h2>
+        <p className="text-lg text-primary-foreground/90 max-w-md leading-relaxed">
+          Imagenes hiperrealistas generadas por IA para que puedas compartir y recordar cada momento especial.
+        </p>
+
+        <div className="flex gap-2 mt-8">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "bg-primary-foreground w-12"
+                  : "bg-primary-foreground/40 w-8 hover:bg-primary-foreground/60"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
