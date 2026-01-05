@@ -34,7 +34,7 @@ export default function GeneralMenu() {
   };
 
   return (
-    <div className="flex flex-col w-72 h-[calc(100vh)] border-r p-3 gap-56">
+    <div className="flex flex-col w-72 h-[calc(100vh)] border-r p-6 gap-56">
       <div className="flex flex-col gap-6">
         <div className="font-bold flex gap-2  text-xl">
           <Image src="/logo.svg" alt="Logo" width={100} height={25} priority={true}  className="w-[120px] h-auto" />
@@ -61,12 +61,12 @@ export default function GeneralMenu() {
                       size="lg"
                       aria-label="Submit"
                       className={
-                        "w-full flex justify-start cursor-pointer" +
-                        (option.isActive ? " bg-gray-100 font-bold" : "")
+                        "w-full flex justify-start cursor-pointer gap-3" +
+                        (option.isActive ? " bg-gray-100  text-[#A565FF] hover:text-[#A565FF]" : " text-gray-500 ")
                       }
                     >
-                      <DynamicIcon name={option.icon} />
-                      {option.label}
+                      <DynamicIcon name={option.icon} className={" size-5 "}/>
+                      <p className={option.isActive ? "text-[#A565FF]" : " text-black "}>{option.label}</p>
                     </Button>
                   </Link>
                 </li>
