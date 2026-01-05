@@ -37,7 +37,7 @@ export default function GeneralMenu() {
     <div className="flex flex-col w-72 h-[calc(100vh)] border-r p-3 gap-56">
       <div className="flex flex-col gap-6">
         <div className="font-bold flex gap-2  text-xl">
-          <Image src="/logo.svg" alt="Logo" width={100} height={25} priority={true} />
+          <Image src="/logo.svg" alt="Logo" width={100} height={25} priority={true}  className="w-[120px] h-auto" />
         </div>
         <div className="flex flex-col gap-3">
           <Link href="/dashboard/create-illustration" onClick={resetMenu}>

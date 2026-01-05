@@ -11,7 +11,7 @@ const initialValue: UISettings = {
     },
     {
       isActive: false,
-      label: "Clientes",
+      label: "Perfiles",
       icon: "user-round",
       link: "/dashboard/profiles",
     },
@@ -19,7 +19,7 @@ const initialValue: UISettings = {
       isActive: false,
       label: "Configuración",
       icon: "settings",
-      link: "/dashboard/create-illustration",
+      link: "/dashboard/settings",
     },
   ],
 };

@@ -1,12 +1,14 @@
 export interface ProfileSchema {
+  age: number;
+  avatar_picture_url: string;
+  created_at: string;
+  doc: number;
+  email: string;
   id: string;
   id_company: string;
-  uuid_user: string;
+  is_active: boolean;
   name: string;
-  age: number;
-  doc: number;
   phone: string;
-  created_at: string;
   uuid_profile: string;
-  avatar_picture_url?: string;
+  uuid_user: string;
 }

@@ -5,5 +5,5 @@ export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 export const config = {
-  matcher: ['/dashboard/:path*', '/checkout/:path*', '/profile/:path*', '/login'],
+  matcher: ['/dashboard/:path*', '/checkout/:path*', '/profiles/:path*', '/login', '/profiles'],
 };

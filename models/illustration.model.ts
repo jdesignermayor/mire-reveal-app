@@ -41,6 +41,8 @@ export interface IllustrationSchema {
   created_at: string;
   user_id: string;
   model_id: string;
+  team_id: string;
+  user_name?: string;
   profile_id: string;
   description: string;
   gestational_week: string;
