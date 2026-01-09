@@ -1,8 +1,9 @@
 import { DBTableList } from "@/lib/db.schema";
 import { supabaseServer } from "@/lib/supabase/server";
-import { ProfileSchema } from "@/models/profile.model";
+import { Profile } from "@/models/profile.model";
 
-export async function getProfiles() : Promise<ProfileSchema[]> {
+
+export async function getProfiles() : Promise<Profile[]> {
     try {
         const supabase = await supabaseServer();
 
@@ -21,7 +22,7 @@ export async function getProfiles() : Promise<ProfileSchema[]> {
     }
 }
 
-export async function getProfileById(id: string): Promise<ProfileSchema | null> {
+export async function getProfileById(id: number): Promise<Profile | null> {
     try {
         const supabase = await supabaseServer();
 
@@ -34,28 +35,10 @@ export async function getProfileById(id: string): Promise<ProfileSchema | null> 
             throw error;
         }
 
-        const profileData = data as ProfileSchema;
-        return profileData;
+        const profileData = data;
+        return profileData as Profile;
 
     } catch(error){
         return null;
-    }
-}
-
-export async function updateProfile(profile: ProfileSchema) {
-    try {
-        // const supabase = await supabaseServer();
-        console.log('profile;', profile)
-        // const { data, error } = await supabase
-        //     .from(DBTableList.PROFILES)
-        //     .upsert({...profile})
-        //     .eq('id', profile.id).single();
-
-        // if (error) {
-        //     throw error;
-        // }
-
-    } catch (error) {
-        throw Error('Error')
     }
 }

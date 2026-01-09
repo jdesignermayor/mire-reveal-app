@@ -16,50 +16,59 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 
+import { GetSettingsType, updateSettings } from "@/actions/settings";
 import { Clipboard, FileText, Layers, Mail, Phone, Plus, User } from "lucide-react";
-
-const teams = [
-  { label: "Equipo A", value: "team_a" },
-  { label: "Equipo B", value: "team_b" },
-  { label: "Equipo C", value: "team_c" },
-];
+import { LoadImagesButton } from "@/components/shared/LoadImagesButton";
+import Image from "next/image";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const formSchema = z.object({
-  name: z.string().min(2, "El nombre es obligatorio"),
-  email: z.string().email("Email inválido"),
-  phone: z.coerce.string().min(7, "Teléfono inválido"),
-  nit: z.coerce.string().min(5, "NIT inválido"),
-  team: z.string().min(1, "Selecciona un equipo"),
-  logo: z.instanceof(File).optional(),
-  watermark: z.instanceof(File).optional(),
-  plan: z.enum(["free", "pro"]),
+    name: z.string().min(2, "El nombre es obligatorio"),
+    email: z.email("Email inválido"),
+    phone: z.string().optional(),
+    nit: z.string().optional(),
+    logo: z.string().nullable(),
+    watermark: z.string().nullable().optional(),
+    plan: z.enum(["free", "pro"]),
 });
 
-export type FormValues = z.input<typeof formSchema>;
+export type SettingsFormValues = z.input<typeof formSchema>;
 
-export default function SettingsForm() {
-    const form = useForm<FormValues>({
+export default function SettingsForm({ settings }: { settings: GetSettingsType }) {
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    const form = useForm<SettingsFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            email: "",
-            phone: "",
-            nit: "",
-            team: "",
+            name: settings.company.name || "",
+            email: settings.user.email || "",
+            phone: settings.company.phone?.toString() || "",
+            nit: settings.company.nit || "",
             plan: "free",
+            watermark: settings.company.watermark_url || "",
+            logo: settings.company.logo_url || "",
         },
     });
 
-    const onSubmit = (values: FormValues) => {
-        console.log("Formulario enviado:", values);
+    const onSubmit = async (values: SettingsFormValues) => {
+        setIsLoading(true);
+        if (!settings.company.uuid_company) {
+            return;
+        }
+
+      try {
+        await updateSettings({ settingFormValues: values, uuid_company: settings.company.uuid_company });
+        toast.success("Configuración actualizada correctamente.");
+       
+        router.push("/dashboard");
+      } catch (error) {
+        
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     return (
@@ -95,7 +104,7 @@ export default function SettingsForm() {
                                     <Mail className="w-4 h-4" /> Email principal
                                 </FormLabel>
                                 <FormControl>
-                                    <Input {...field} type="email" placeholder="correo@ejemplo.com" />
+                                    <Input {...field} type="email" placeholder="correo@ejemplo.com" disabled={true} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -144,7 +153,7 @@ export default function SettingsForm() {
                 </div>
 
                 {/* Logo y Marca de agua */}
-                <div className="grid sm:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6 ">
                     <FormField
                         control={form.control}
                         name="logo"
@@ -154,16 +163,35 @@ export default function SettingsForm() {
                                     <Clipboard className="w-4 h-4" /> Logo
                                 </FormLabel>
                                 <FormControl>
-                                    <label className="cursor-pointer flex items-center gap-2 border border-dashed border-gray-300 rounded-md p-3 hover:bg-gray-50 transition-colors">
-                                        <span>{field.value?.name || "Selecciona un archivo"}</span>
-                                        <Input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(e) => field.onChange(e.target.files?.[0])}
-                                        />
-                                    </label>
+                                    <Input
+                                        id="logo-field"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
                                 </FormControl>
+                                <div className="flex gap-5">
+                                    <div >
+                                        <p>Actual</p>
+                                        <Image
+                                            src={settings.logo_public_url ?? '/empty-image.jpg'}
+                                            alt="image"
+                                            placeholder="blur"
+                                            blurDataURL="/empty-image.jpg"
+                                            priority={false}
+                                            width={240}
+                                            height={240}
+                                            className="w-40 h-40 object-cover rounded-full border"
+                                        />
+                                    </div>
+                                    <div>
+                                        <p>Cambiar</p>
+                                        <LoadImagesButton multiple={false} isAsset={true} onUpload={(path) => {
+                                            field.onChange(path);
+                                        }} fieldId="logo-field" />
+                                    </div>
+
+                                </div>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -178,16 +206,35 @@ export default function SettingsForm() {
                                     <Clipboard className="w-4 h-4" /> Marca de agua
                                 </FormLabel>
                                 <FormControl>
-                                    <label className="cursor-pointer flex items-center gap-2 border border-dashed border-gray-300 rounded-md p-3 hover:bg-gray-50 transition-colors">
-                                        <span>{field.value?.name || "Selecciona un archivo"}</span>
-                                        <Input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(e) => field.onChange(e.target.files?.[0])}
-                                        />
-                                    </label>
+                                    <Input
+                                        id="watermark-field"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => field.onChange(e.target.files?.[0])}
+                                    />
                                 </FormControl>
+                                <div className="flex gap-5">
+                                    <div>
+                                        <p>Actual</p>
+                                        <Image
+                                            src={settings.watermark_public_url ?? '/empty-image.jpg'}
+                                            placeholder="blur"
+                                            blurDataURL="/empty-image.jpg"
+                                            priority={false}
+                                            alt="image"
+                                            width={240}
+                                            height={240}
+                                            className="w-40 h-40 object-cover rounded-full border"
+                                        />
+                                    </div>
+                                    <div>
+                                        <p>Cambiar</p>
+                                        <LoadImagesButton multiple={false} isAsset={true} fieldId="watermark-field" onUpload={(path) => {
+                                            field.onChange(path);
+                                        }} />
+                                    </div>
+                                </div>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -195,39 +242,14 @@ export default function SettingsForm() {
                 </div>
 
                 {/* Equipo con botón para gestionar */}
-                <div className="grid sm:grid-cols-2 gap-6 items-end">
-                    <FormField
-                        control={form.control}
-                        name="team"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                    <Layers className="w-4 h-4" /> Equipo
-                                </FormLabel>
-                                <div className="flex gap-2">
-                                    <Select onValueChange={field.onChange} value={field.value} className="flex-1">
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Selecciona un equipo" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {teams.map((team) => (
-                                                <SelectItem key={team.value} value={team.value}>
-                                                    {team.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Button variant="outline" className="flex items-center gap-1">
-                                        <Plus className="w-4 h-4" /> Gestionar
-                                    </Button>
-                                </div>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+                {/* <div className="grid gap-6 items-end">
+                    <p className="flex items-center gap-2">
+                        <Layers className="w-4 h-4" /> Equipo
+                    </p>
+                    <Button variant="outline" type="button" className="flex items-center gap-1">
+                        <Plus className="w-4 h-4" /> Gestionar
+                    </Button>
+                </div> */}
 
                 {/* Plan */}
                 <FormField
@@ -241,22 +263,20 @@ export default function SettingsForm() {
                             <div className="flex items-center gap-4 mt-2">
                                 <button
                                     type="button"
-                                    className={`px-4 py-2 rounded-md border ${
-                                        field.value === "free"
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-100 text-gray-700"
-                                    }`}
+                                    className={`px-4 py-2 rounded-md border ${field.value === "free"
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100 text-gray-700"
+                                        }`}
                                     onClick={() => field.onChange("free")}
                                 >
                                     Free
                                 </button>
                                 <button
                                     type="button"
-                                    className={`px-4 py-2 rounded-md border ${
-                                        field.value === "pro"
-                                            ? "bg-green-500 text-white"
-                                            : "bg-gray-100 text-gray-700"
-                                    }`}
+                                    className={`px-4 py-2 rounded-md border ${field.value === "pro"
+                                        ? "bg-green-500 text-white"
+                                        : "bg-gray-100 text-gray-700"
+                                        }`}
                                     onClick={() => field.onChange("pro")}
                                 >
                                     Pro 🚀
@@ -266,8 +286,8 @@ export default function SettingsForm() {
                     )}
                 />
 
-                <Button type="submit" className="w-full sm:w-48 mt-4">
-                    Guardar información
+                <Button disabled={isLoading} type="submit" className="w-full sm:w-48 mt-4">
+                    {isLoading ? 'Guardando...' : 'Guardar información'}
                 </Button>
             </form>
         </Form>

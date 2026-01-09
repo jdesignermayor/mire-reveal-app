@@ -5,39 +5,47 @@ import { useAtom } from "jotai";
 import { PaintbrushIcon } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import type { MenuOption } from "@/models/ui-settings.model";
 import { resetMenuOptions, UISettingsAtom } from "@/store/ui-settings-store";
 import Image from "next/image";
 import SignOutButton from "./SignOutButton";
+import { Suspense } from "react";
+import CompanyLogoPanel from "./CompanyLogoPanel";
+import { GetSettingsType } from "@/actions/settings";
 
 
-export default function GeneralMenu() {
-  const [uiSettings, setUISettings] = useAtom(UISettingsAtom);
+export default function GeneralMenu({ settings }: { settings: GetSettingsType }) {
+  const [uiSettings] = useAtom(UISettingsAtom);
   const { menuOptions } = uiSettings;
+  const pathname = usePathname();
   const [, resetMenu] = useAtom(resetMenuOptions);
 
-  const handleMenuOptionClick = (option: MenuOption) => {
-    const computedOptions = menuOptions.map((currentOption) => {
-      let isActivated = false;
-
-      if (currentOption.label === option.label) {
-        isActivated = true;
-      }
+  // Compute active state directly from pathname instead of storing in state
+  const menuOptionsWithActiveState = menuOptions.map((option) => {
+    // Special handling for dashboard root - only exact matches
+    if (option.link === "/dashboard") {
       return {
-        ...currentOption,
-        isActive: isActivated,
+        ...option,
+        isActive: pathname === "/dashboard" || pathname === "/dashboard/",
       };
-    });
+    }
 
-    setUISettings({ ...uiSettings, menuOptions: computedOptions });
+    return {
+      ...option,
+      isActive: pathname === option.link || pathname.startsWith(option.link + "/"),
+    };
+  });
+
+  const handleMenuOptionClick = () => {
+    resetMenu();
   };
 
   return (
     <div className="flex flex-col w-72 h-[calc(100vh)] border-r p-6 gap-56">
       <div className="flex flex-col gap-6">
-        <div className="font-bold flex gap-2  text-xl">
-          <Image src="/logo.svg" alt="Logo" width={100} height={25} priority={true}  className="w-[120px] h-auto" />
+        <div className="font-bold flex gap-2 h-10">
+            <CompanyLogoPanel settings={settings} />
         </div>
         <div className="flex flex-col gap-3">
           <Link href="/dashboard/create-illustration" onClick={resetMenu}>
@@ -49,12 +57,14 @@ export default function GeneralMenu() {
         </div>
         <div>
           <ul className="flex flex-col pt-3 gap-1">
-            {menuOptions.map((option) => {
+            {menuOptionsWithActiveState.map((option) => {
               return (
                 <li key={option.label}>
                   <Link
                     href={option.link}
-                    onClick={() => handleMenuOptionClick(option)}
+                    prefetch={false}
+                    onClick={handleMenuOptionClick}
+                    shallow={true}
                   >
                     <Button
                       variant={"ghost"}
@@ -65,7 +75,7 @@ export default function GeneralMenu() {
                         (option.isActive ? " bg-gray-100  text-[#A565FF] hover:text-[#A565FF]" : " text-gray-500 ")
                       }
                     >
-                      <DynamicIcon name={option.icon} className={" size-5 "}/>
+                      <DynamicIcon name={option.icon} className={" size-5 "} />
                       <p className={option.isActive ? "text-[#A565FF]" : " text-black "}>{option.label}</p>
                     </Button>
                   </Link>
@@ -75,7 +85,7 @@ export default function GeneralMenu() {
           </ul>
         </div>
         <div>
-         <SignOutButton />
+          <SignOutButton />
         </div>
       </div>
     </div>

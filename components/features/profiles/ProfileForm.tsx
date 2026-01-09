@@ -14,10 +14,10 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ProfileSchema } from "@/models/profile.model";
 import { createProfileMutation, updateProfileMutation } from "@/mutations/getprofiles.mutation";
 import { Calendar, FileText, Mail, Phone, User } from "lucide-react";
 import { toast } from "sonner";
+import { Profile } from "@/models/profile.model";
 
 const formSchema = z.object({
   name: z.string().min(2, "Full name must be at least 2 characters"),
@@ -36,7 +36,7 @@ const formSchema = z.object({
 
 export type TypeProfileValuesForm = z.input<typeof formSchema>;
 
-export default function ProfileForm({ profile }: { profile?: ProfileSchema | null}) {
+export default function ProfileForm({ profile }: { profile?: Profile }) {
     const isEditing = profile ? true : false;
     const upsertProfile = updateProfileMutation();
     const insertProfile = createProfileMutation();
@@ -66,7 +66,7 @@ export default function ProfileForm({ profile }: { profile?: ProfileSchema | nul
         const completedProfile = {
             ...profile,
             ...profileFormValues
-        } as ProfileSchema;
+        } as Profile;
 
         upsertProfile.mutate(completedProfile);
         

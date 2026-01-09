@@ -1,6 +1,13 @@
+import { getSettings } from "@/actions/settings";
 import SettingsForm from "@/components/features/settings/SettingsForm";
 
-export default function SettingsPage(){
+export default async function SettingsPage(){
+    const settings = await getSettings();
+    
+    if(!settings){
+        return;
+    }
+
     return <section className="p-6">
             <div className="grid gap-8">
                 <div className="flex justify-between items-center">
@@ -12,7 +19,7 @@ export default function SettingsPage(){
                     </div>
                 </div>
                 <div>
-                    <SettingsForm />
+                    <SettingsForm settings={settings} />
                 </div>
             </div>
         </section>

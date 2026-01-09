@@ -7,7 +7,7 @@ const initialValue: UISettings = {
       isActive: true,
       label: "Inicio",
       icon: "home",
-      link: "/dashboard/",
+      link: "/dashboard",
     },
     {
       isActive: false,

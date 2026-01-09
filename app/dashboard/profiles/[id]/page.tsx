@@ -2,7 +2,7 @@ import { getProfileById } from "@/actions/profiles";
 import ProfileDetailBreadcrumb from "@/components/features/profiles/ProfileDetailBreadcrumb";
 import ProfileForm from "@/components/features/profiles/ProfileForm";
 
-export default async function EditProfilePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditProfilePage({ params }: { params: Promise<{ id: number }> }) {
     const { id } = await params;
     const profileData = await getProfileById(id);
 

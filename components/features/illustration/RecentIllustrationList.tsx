@@ -1,7 +1,7 @@
 import { getIllustrations } from "@/actions/illustrations";
 
 export default async function RecentIllustrationList() {
-    const illustrations = await getIllustrations({ accountId: "94e49535-fc86-4b50-9271-18ad74f54c0c", teamId: "1" });
+    const illustrations = await getIllustrations({ accountId: "94e49535-fc86-4b50-9271-18ad74f54c0c", teamId: 1 });
 
     return <div className="flex gap-3 ">
         {illustrations.map((illustration) => (

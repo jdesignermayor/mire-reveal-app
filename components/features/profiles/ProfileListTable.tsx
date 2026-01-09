@@ -35,10 +35,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ProfileSchema } from "@/models/profile.model"
 import Link from "next/link"
+import { Profile } from "@/models/profile.model"
 
-export const columns: ColumnDef<ProfileSchema>[] = [
+export const columns: ColumnDef<Profile>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -146,7 +146,7 @@ export const columns: ColumnDef<ProfileSchema>[] = [
   },
 ]
 
-export function ProfileListTable({ data = [] }: { data?: ProfileSchema[] }) {
+export function ProfileListTable({ data = [] }: { data?: Profile[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

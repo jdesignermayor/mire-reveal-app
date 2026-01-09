@@ -23,34 +23,6 @@ export interface IllustrationImage {
   createdAt: string;
 }
 
-export interface Illustration {
-  id: string;
-  userId: string;
-  profileId: string;
-  modelId: string;
-  processStatus: ILLUSTRATION_STATUS;
-  description: string;
-  images: ImageDataFormat[];
-  gestationalWeek?: string;
-  avatarPictureUrl?: string;
-  createdAt: string;
-}
-
-export interface IllustrationSchema {
-  id: string;
-  created_at: string;
-  user_id: string;
-  model_id: string;
-  team_id: string;
-  user_name?: string;
-  profile_id: string;
-  description: string;
-  gestational_week: string;
-  images: ImageDataFormat[];
-  avatar_picture_url: string;
-  process_status: ILLUSTRATION_STATUS;
-}
-
 export interface ResponsePostIllustrationSchema {
   id: string;
 }
