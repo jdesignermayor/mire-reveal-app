@@ -14,7 +14,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createProfileMutation, updateProfileMutation } from "@/mutations/getprofiles.mutation";
+import { createProfileMutation, updateProfileMutation } from "@/mutations/profiles.mutation";
 import { Calendar, FileText, Mail, Phone, User } from "lucide-react";
 import { toast } from "sonner";
 import { Profile } from "@/models/profile.model";
@@ -106,7 +106,7 @@ export default function ProfileForm({ profile }: { profile?: Profile }) {
                             Nombre completo
                         </FormLabel>
                         <FormControl>
-                            <Input {...field} placeholder="John Doe" />
+                            <Input {...field} placeholder="Nombre completo" />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
