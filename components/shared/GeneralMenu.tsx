@@ -51,7 +51,7 @@ export default function GeneralMenu({ settings }: { settings: GetSettingsType })
           <Link href="/dashboard/create-illustration" onClick={resetMenu}>
             <Button className="w-full cursor-pointer bg-[#A565FF] hover:bg-[#9B4DFF] text-white">
               <PaintbrushIcon />
-              Crear ecografía hiperrealista
+              Revelar ecografía hiperrealista
             </Button>
           </Link>
         </div>

@@ -9,7 +9,7 @@ export default function CompanyLogoPanel({ settings }: { settings: GetSettingsTy
             <Image src="/logo.svg" alt="Logo" width={100} height={25} priority={true} className=" w-15 h-40" />
         </div>
         <div>
-            <Image src={settings.logo_public_url} alt="Logo" width={100} height={100} priority={true} className="w-15 h-auto rounded-full" />
+            <Image src={settings.logo_public_url || "/logo.svg"} alt="Logo" width={100} height={100} priority={true} className="w-15 h-15 rounded-full object-cover" />
         </div>
     </div>
 }
