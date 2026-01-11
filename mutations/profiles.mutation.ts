@@ -3,7 +3,7 @@
 import {  TypeProfileValuesForm } from "@/components/features/profiles/ProfileForm";
 import { DBTableList } from "@/lib/db.schema";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Profile } from "@/models/profile.model";
 
 export function updateProfileMutation() {
@@ -42,6 +42,23 @@ export function createProfileMutation(){
       }
 
       return data;
+    }
+  })
+}
+
+export function getProfilesQuery(){
+  const supabase = supabaseBrowser();
+  return useQuery({
+    queryKey: ["profiles"],
+    staleTime: 60 * 60 * 1000, // 1 hour
+    queryFn: async () => {
+      const resp = await supabase.from(DBTableList.PROFILES).select('*')
+
+      if (resp.error) {
+        throw resp.error;
+      }
+
+      return resp.data;
     }
   })
 }
