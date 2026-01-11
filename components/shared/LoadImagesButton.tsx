@@ -17,6 +17,7 @@ type Props = {
   isAsset?: boolean;
   onUpload?: (path: string | null) => void;
   onReset?: () => void;
+  setValue?: any;
 };
 
 export function LoadImagesButton({
@@ -24,16 +25,13 @@ export function LoadImagesButton({
   fieldId,
   isAsset = false,
   onUpload,
+  setValue,
 }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [images, setImages] = useState<ImageFormat[]>([]);
-  const bucketName = isAsset ? "company_assets" : "public";
+  const bucketName = isAsset ? "company_assets" : "profile_assets";
   const isEmpty = images.length === 0;
 
-
-  /* ===============================
-     PROCESAR ARCHIVOS
-  =============================== */
   const processFiles = async (files: FileList | File[]) => {
     if (!files || files.length === 0) return;
 
@@ -78,9 +76,18 @@ export function LoadImagesButton({
         );
 
         setImages(updated);
-
-        // 🔥 avisamos al form
         onUpload?.(upload.path);
+
+        const cleanedForForm = updated.map((img) => ({
+          ...img,
+          base64: "",
+        }));
+
+        setValue?.("images", cleanedForForm, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
       });
     }
   };
@@ -123,13 +130,26 @@ export function LoadImagesButton({
   /* ===============================
      ELIMINAR IMAGEN
   =============================== */
-  const removeImage = async (path?: string | null) => {
+  const removeImage = async (path?: string | null, index?: number) => {
     if (!path) return;
 
     try {
       await removeImageToBucket({ path, bucketName });
-      setImages([]);
+      const updatedImages = images.filter((_, i) => i !== index);
+      setImages(updatedImages);
       onUpload?.(null);
+
+      // Update form when image is removed
+      const cleanedForForm = updatedImages.map((img) => ({
+        ...img,
+        base64: "",
+      }));
+
+      setValue?.("images", cleanedForForm, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
     } catch {
       toast.error("Error eliminando la imagen");
     }
@@ -164,6 +184,10 @@ export function LoadImagesButton({
             <p className="text-sm text-muted-foreground">
               Arrastra o haz clic para seleccionar
             </p>
+            {multiple && <p className="text-xs text-muted-foreground mt-2">
+              Formatos: JPG, PNG, GIF, WebP • Máximo 5 imágenes • Máximo 4MB
+              por imagen
+            </p>}
           </div>
         </button>
       )}
@@ -180,8 +204,8 @@ export function LoadImagesButton({
               <Button
                 type="button"
                 size="icon"
-                className="absolute top-2 right-2 z-10"
-                onClick={() => removeImage(img.path)}
+                className="absolute top-2 right-2 z-10 cursor-pointer hover:opacity-75"
+                onClick={() => removeImage(img.path, index)}
               >
                 <TrashIcon className="size-4" />
               </Button>
@@ -195,6 +219,14 @@ export function LoadImagesButton({
               />
             </div>
           ))}
+         {multiple && <Button
+              type="button"
+              variant="ghost"
+              onClick={openFileDialog}
+              className=" cursor-pointer w-60 h-60 rounded-md flex items-center justify-center outline-1 -outline-offset-1 outline-gray-900/20 outline-dashed dark:outline-white/20"
+            >
+              <PlusIcon />
+            </Button>}
         </div>
       )}
     </>
