@@ -21,6 +21,12 @@ const initialValue: UISettings = {
       icon: "settings",
       link: "/dashboard/settings",
     },
+    {
+      isActive: false,
+      label: "Admin",
+      icon: "lock",
+      link: "/dashboard/admin",
+    }
   ],
 };
 
