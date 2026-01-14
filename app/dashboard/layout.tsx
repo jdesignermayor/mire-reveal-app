@@ -7,6 +7,7 @@ export default async function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const settings = await getSettings();
+  const isAdmin = settings?.user?.is_super_admin || false;
   
   if(!settings){
       return;
@@ -16,7 +17,7 @@ export default async function DashboardLayout({
       <div className="relative h-[calc(95vh)]">
         <div className="flex ">
           <div>
-            <GeneralMenu settings={settings} />
+            <GeneralMenu settings={settings} isAdmin={isAdmin} />
           </div>
           <div className="flex justify-center w-full ">
             <div className="flex w-full h-full">

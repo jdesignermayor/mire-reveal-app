@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function ProfilesPage(){
+
+    
     const profiles = await getProfiles();
     
     return <section className="p-6">
