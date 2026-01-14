@@ -174,7 +174,7 @@ export default function SettingsForm({ settings }: { settings: GetSettingsType }
                                     <div >
                                         <p>Actual</p>
                                         <Image
-                                            src={settings.logo_public_url ?? '/empty-image.jpg'}
+                                            src={settings.logo_public_url || '/empty-image.jpg'}
                                             alt="image"
                                             placeholder="blur"
                                             blurDataURL="/empty-image.jpg"
@@ -218,7 +218,7 @@ export default function SettingsForm({ settings }: { settings: GetSettingsType }
                                     <div>
                                         <p>Actual</p>
                                         <Image
-                                            src={settings.watermark_public_url ?? '/empty-image.jpg'}
+                                            src={settings.watermark_public_url || '/empty-image.jpg'}
                                             placeholder="blur"
                                             blurDataURL="/empty-image.jpg"
                                             priority={false}
