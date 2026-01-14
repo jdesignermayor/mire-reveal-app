@@ -26,6 +26,10 @@ import {
 } from "@/components/ui/select";
 import { LoadImagesButton } from "@/components/shared/LoadImagesButton";
 import { getProfilesQuery } from "@/mutations/profiles.mutation";
+import { Profile } from "@/models/profile.model";
+import { createIllustration } from "@/actions/illustrations";
+import { toast } from "sonner";
+import { useState } from "react";
 
 /* ------------------ Schema ------------------ */
 
@@ -57,8 +61,12 @@ const formSchema = z.object({
         .min(1, { message: "At least one image is required." }),
 });
 
+export type IllustrationFormData = z.infer<typeof formSchema>;
+
 export default function RevealIllustrationForm() {
-    const { data: profiles } = getProfilesQuery();
+    const { data } = getProfilesQuery();
+    const profiles = data?.profiles;
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -72,15 +80,25 @@ export default function RevealIllustrationForm() {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log("FORM VALUES:", values);
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsSubmitting(true);
+        try {
+            // TODO: Implement actual submission logic
+            console.log("Submitting illustration:", values);
+            await createIllustration(values);
+            toast.success("Ecografía hiperrealista cargada correctamente, espere a que se procese...");
+        } catch (error) {
+            console.error("Error submitting illustration:", error);
+            toast.error("Error al cargar la ecografía");
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
         <div className="max-w-xl space-y-8">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
                     {/* Images */}
                     <FormField
                         control={form.control}
@@ -128,7 +146,7 @@ export default function RevealIllustrationForm() {
                                         </FormControl>
 
                                         <SelectContent>
-                                            {profiles?.map((profile) => (
+                                            {profiles?.length > 0 && profiles?.map((profile: Profile) => (
                                                 <SelectItem
                                                     key={profile.id}
                                                     value={profile.id.toString()}
@@ -262,7 +280,7 @@ export default function RevealIllustrationForm() {
                     </div>
 
                     <Button type="submit" className="w-full">
-                        Submit
+                        {isSubmitting ? "Cargando..." : "Cargar"}
                     </Button>
                 </form>
             </Form>
