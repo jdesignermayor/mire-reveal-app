@@ -1,9 +1,8 @@
+import { getSettings } from '@/actions/settings';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
-  console.log('updateSession')
-
   let response = NextResponse.next();
   let supabaseResponse = response;
   const supabase = createServerClient(
@@ -30,16 +29,24 @@ export async function updateSession(request: NextRequest) {
   );
 
   const { data } = await supabase.auth.getClaims()
-  const user = data?.claims
+  const user = data?.claims;
 
   const pathname = request.nextUrl.pathname
-  const PROTECTED_ROUTES = ['/dashboard', '/checkout', '/profile']
+  const PROTECTED_ROUTES = ['/dashboard', '/settings', '/profile', '/api/user', '/admin']
 
   const isProtected = PROTECTED_ROUTES.some(path =>
     pathname.startsWith(path)
   )
 
-   console.log('pathname:', pathname)
+  if(pathname === '/dashboard/admin') {
+    const userData = await getSettings();
+    console.log('userData:', userData);
+    if(!userData?.user?.is_super_admin) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+  }
 
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone()

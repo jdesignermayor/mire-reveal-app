@@ -17,6 +17,7 @@ export type Database = {
       tbl_company: {
         Row: {
           created_at: string
+          email: string | null
           id: number
           id_plan: string | null
           id_principal_user: string | null
@@ -31,6 +32,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id?: number
           id_plan?: string | null
           id_principal_user?: string | null
@@ -45,6 +47,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: number
           id_plan?: string | null
           id_principal_user?: string | null
@@ -107,6 +110,8 @@ export type Database = {
       tbl_illustrations: {
         Row: {
           avatar_picture_url: string | null
+          baby_name: string | null
+          company_id: number | null
           created_at: string
           description: string | null
           gestational_week: string | null
@@ -120,6 +125,8 @@ export type Database = {
         }
         Insert: {
           avatar_picture_url?: string | null
+          baby_name?: string | null
+          company_id?: number | null
           created_at?: string
           description?: string | null
           gestational_week?: string | null
@@ -133,6 +140,8 @@ export type Database = {
         }
         Update: {
           avatar_picture_url?: string | null
+          baby_name?: string | null
+          company_id?: number | null
           created_at?: string
           description?: string | null
           gestational_week?: string | null
@@ -144,7 +153,15 @@ export type Database = {
           team_id?: number | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tbl_illustrations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "tbl_company"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tbl_models: {
         Row: {
@@ -280,29 +297,41 @@ export type Database = {
       tbl_users: {
         Row: {
           created_at: string
+          email: string | null
           id: number
           id_company: number | null
           id_role: number | null
           is_active: boolean
+          is_super_admin: boolean | null
+          name: string | null
           name_role: string | null
+          nit: string | null
           uuid_user: string | null
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id?: number
           id_company?: number | null
           id_role?: number | null
           is_active?: boolean
+          is_super_admin?: boolean | null
+          name?: string | null
           name_role?: string | null
+          nit?: string | null
           uuid_user?: string | null
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: number
           id_company?: number | null
           id_role?: number | null
           is_active?: boolean
+          is_super_admin?: boolean | null
+          name?: string | null
           name_role?: string | null
+          nit?: string | null
           uuid_user?: string | null
         }
         Relationships: [

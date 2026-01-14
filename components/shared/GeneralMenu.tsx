@@ -8,15 +8,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { resetMenuOptions, UISettingsAtom } from "@/store/ui-settings-store";
-import Image from "next/image";
 import SignOutButton from "./SignOutButton";
-import { Suspense } from "react";
+import { useEffect } from "react";
 import CompanyLogoPanel from "./CompanyLogoPanel";
 import { GetSettingsType } from "@/actions/settings";
 
 
-export default function GeneralMenu({ settings }: { settings: GetSettingsType }) {
-  const [uiSettings] = useAtom(UISettingsAtom);
+export default function GeneralMenu({ settings, isAdmin }: { settings: GetSettingsType, isAdmin: boolean }) {
+  const [uiSettings, setUiSettings] = useAtom(UISettingsAtom);
   const { menuOptions } = uiSettings;
   const pathname = usePathname();
   const [, resetMenu] = useAtom(resetMenuOptions);
@@ -40,6 +39,13 @@ export default function GeneralMenu({ settings }: { settings: GetSettingsType })
   const handleMenuOptionClick = () => {
     resetMenu();
   };
+
+  useEffect(() => {
+    setUiSettings({
+      ...uiSettings,
+      settings,
+    });
+  }, [settings]);
 
   return (
     <div className="flex flex-col w-72 h-[calc(100vh)] border-r p-6 gap-56">
@@ -82,6 +88,29 @@ export default function GeneralMenu({ settings }: { settings: GetSettingsType })
                 </li>
               );
             })}
+            {isAdmin && (
+              <li>
+                <Link
+                  href="/dashboard/admin"
+                  prefetch={false}
+                  onClick={handleMenuOptionClick}
+                  shallow={true}
+                >
+                  <Button
+                    variant={"ghost"}
+                    size="lg"
+                    aria-label="Submit"
+                    className={
+                      "w-full flex justify-start cursor-pointer gap-3" +
+                      (pathname === "/dashboard/admin" ? " bg-gray-100  text-[#A565FF] hover:text-[#A565FF]" : " text-gray-500 ")
+                    }
+                  >
+                    <DynamicIcon name="settings" className={" size-5 "} />
+                    <p className={pathname === "/dashboard/admin" ? "text-[#A565FF]" : " text-black "}>Admin</p>
+                  </Button>
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
         <div>
