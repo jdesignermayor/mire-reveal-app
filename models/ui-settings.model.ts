@@ -1,3 +1,4 @@
+import { GetSettingsType } from "@/actions/settings";
 import type { IconName } from "lucide-react/dynamic";
 
 export type MenuOption = {
@@ -9,4 +10,5 @@ export type MenuOption = {
 
 export interface UISettings {
   menuOptions: MenuOption[];
+  settings: GetSettingsType | null;
 }

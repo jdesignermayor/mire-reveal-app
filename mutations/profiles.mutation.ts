@@ -27,38 +27,49 @@ export function updateProfileMutation() {
 }
 
 export function createProfileMutation(){
-  const supabase = supabaseBrowser();
   return useMutation({
     mutationFn: async (profile: TypeProfileValuesForm) => {
-      const { data, error } = await supabase
-        .from(DBTableList.PROFILES)
-        // @ts-ignore no error identified
-        .insert({ name: profile.name, doc: profile.doc, age: profile.age, email: profile.email, phone: profile.phone })
-        .select()
-        .single()
 
-      if (error) {
-        throw error;
+      const resp = await fetch("/api/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: profile.name, doc: profile.doc, age: profile.age, email: profile.email, phone: profile.phone }),
+      })
+
+      if (!resp.ok) {
+        const errorBody = await resp.json().catch(() => null)
+        throw new Error(
+          errorBody?.message || "Error al crear el perfil"
+        )
       }
 
-      return data;
+      return resp.json();
     }
   })
 }
 
 export function getProfilesQuery(){
-  const supabase = supabaseBrowser();
   return useQuery({
     queryKey: ["profiles"],
-    staleTime: 60 * 60 * 1000, // 1 hour
     queryFn: async () => {
-      const resp = await supabase.from(DBTableList.PROFILES).select('*')
-
-      if (resp.error) {
-        throw resp.error;
+      
+      const resp = await fetch("/api/profile", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      
+      if (!resp.ok) {
+        const errorBody = await resp.json().catch(() => null)
+        throw new Error(
+          errorBody?.message || "Error al obtener los perfiles"
+        )
       }
 
-      return resp.data;
+      return resp.json();
     }
   })
 }
