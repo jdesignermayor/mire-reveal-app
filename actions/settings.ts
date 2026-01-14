@@ -19,16 +19,6 @@ export type GetSettingsType = {
     logo_public_url: string,
 }
 
-// export async function loadAsset({ type }: { type: 'logo' | 'watermark' }): Promise<string | null>{
-//     const supabase = await supabaseServer();
-
-//     try {
-
-//     } catch (error) {
-//         return null;
-//     }
-// }
-
 async function getCompanyAssets({ logo_path, watermark_path }: { logo_path: string, watermark_path: string }): Promise<string[]> {
     const supabase = await supabaseServer();
     const imagePaths = [logo_path, watermark_path]; // Array of paths
@@ -51,7 +41,6 @@ async function getCompanyAssets({ logo_path, watermark_path }: { logo_path: stri
 export async function getSettings(): Promise<GetSettingsType | null>{
     const supabase = await supabaseServer();
     
-    // get user information in the auth
     const { user } = await getAuthData();
 
     if(!user){
@@ -60,7 +49,6 @@ export async function getSettings(): Promise<GetSettingsType | null>{
 
     try {
         const uuidUser = user.id;
-        // get user information in the db
 
         const { data: userData, error: errorUser  } = await supabase.from(DBTableList.USERS)
         .select('*')
@@ -90,8 +78,8 @@ export async function getSettings(): Promise<GetSettingsType | null>{
         const computedResult : GetSettingsType = {
             user: computedUser,
             company: companyData,
-            watermark_public_url: watermarkAssetURL,
-            logo_public_url: logoAssetURL,
+            watermark_public_url: watermarkAssetURL || '',
+            logo_public_url: logoAssetURL || '',
         }
 
         return computedResult;
@@ -105,7 +93,7 @@ export async function updateSettings({ settingFormValues, uuid_company }: { sett
     const supabase = await supabaseServer();
 
     try {
-        const { data ,error } = await supabase.from(DBTableList.COMPANY)
+        const { error } = await supabase.from(DBTableList.COMPANY)
         .update({
             name: settingFormValues.name,
             phone: settingFormValues.phone,
