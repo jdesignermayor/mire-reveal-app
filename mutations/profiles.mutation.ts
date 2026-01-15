@@ -60,6 +60,7 @@ export function getProfilesQuery(){
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "same-origin",
       })
       
       if (!resp.ok) {
