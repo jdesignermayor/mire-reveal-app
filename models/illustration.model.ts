@@ -1,3 +1,5 @@
+import { Database } from "@/lib/supabase/types";
+
 export interface ImageDataFormat {
   id: string;
   isFinished: boolean;
@@ -39,3 +41,5 @@ export enum ILLUSTRATION_STATUS {
   COMPLETED = "COMPLETED",
   FAILED = "FAILED",
 }
+export type Illustration =
+    Database['public']['Tables']['tbl_illustrations']['Row'] & { user_name: string }

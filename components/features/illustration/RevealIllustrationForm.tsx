@@ -29,9 +29,11 @@ import { getProfilesQuery } from "@/mutations/profiles.mutation";
 import { Profile } from "@/models/profile.model";
 import { createIllustration } from "@/actions/illustrations";
 import { toast } from "sonner";
-import { useState } from "react";
-
-/* ------------------ Schema ------------------ */
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Illustration, ILLUSTRATION_STATUS } from "@/models/illustration.model";
+import { useAtom, useSetAtom } from "jotai";
+import { UIIllustrationAtom, resetIllustrationAtomState } from "@/store/ui-illustration.store";
 
 const imageSchema = z.object({
     name: z.string(),
@@ -64,9 +66,21 @@ const formSchema = z.object({
 export type IllustrationFormData = z.infer<typeof formSchema>;
 
 export default function RevealIllustrationForm() {
+    const router = useRouter();
     const { data } = getProfilesQuery();
     const profiles = data?.profiles;
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const resetIllustrationState = useSetAtom(resetIllustrationAtomState);
+    const [, setIllustration] = useAtom(UIIllustrationAtom);
+
+    const handleRedirection = (illustration: Illustration) => {
+        router.replace(`/dashboard/create-illustration/${illustration.id}`);
+        setIllustration({
+            illustration,
+            updatedImages: [],
+            updatedStatus: ILLUSTRATION_STATUS.PENDING,
+        });
+    };
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -85,8 +99,10 @@ export default function RevealIllustrationForm() {
         try {
             // TODO: Implement actual submission logic
             console.log("Submitting illustration:", values);
-            await createIllustration(values);
+            const illustration = await createIllustration(values);
+
             toast.success("Ecografía hiperrealista cargada correctamente, espere a que se procese...");
+            handleRedirection(illustration);
         } catch (error) {
             console.error("Error submitting illustration:", error);
             toast.error("Error al cargar la ecografía");
@@ -94,6 +110,16 @@ export default function RevealIllustrationForm() {
             setIsSubmitting(false);
         }
     }
+
+    useEffect(() => {
+        // Reset illustration atom state when component mounts
+        resetIllustrationState();
+
+        // Cleanup function when component unmounts
+        return () => {
+            resetIllustrationState();
+        };
+    }, [resetIllustrationState]);
 
     return (
         <div className="max-w-xl space-y-8">

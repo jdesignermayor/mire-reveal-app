@@ -31,8 +31,6 @@ export async function GET(req: NextRequest) {
         .eq('is_active', true)
         .eq('id_company', company.id);
 
-    console.log('getProfiles', data, error)
-
     if (error) {
         return NextResponse.json(
             { message: "Error fetching profiles", error: error.message },
