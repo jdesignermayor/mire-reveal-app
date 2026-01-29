@@ -1,8 +1,5 @@
-import { getIllustrationById } from "@/actions/illustrations";
 import RevealIllustrationPanel from "@/components/features/illustration/RevealIllustrationPanel";
-import { Illustration } from "@/models/illustration.model";
 import { EyeIcon } from "lucide-react";
-import { notFound } from "next/navigation";
 
 export default async function CreateIllustrationPage({
   params,
@@ -18,13 +15,11 @@ export default async function CreateIllustrationPage({
               <div className="flex items-center">
                 <p className="font-bold text-lg">
                   <EyeIcon className="size-6" />
-                  Revelar ecografía hiperrealista
+                  Reveal hyper-realistic ultrasound
                 </p>
               </div>
               <p className="text-muted-foreground text-sm">
-                Revela tu ecografía hiperrealista creada, una ves finalizada la
-                generación, puedes verla y compartirla con tus amigos y
-                familiares.
+                Reveal your created hyper-realistic ultrasound. Once generation is complete, you can view it and share it with your friends and family.
               </p>
             </div>
             <div className="pt-6 w-full">

@@ -1,39 +1,39 @@
 "use client";
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import {
     Form,
+    FormControl,
     FormField,
     FormItem,
     FormLabel,
-    FormControl,
     FormMessage,
 } from "@/components/ui/form";
 
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { createIllustration } from "@/actions/illustrations";
+import { LoadImagesButton } from "@/components/shared/LoadImagesButton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
     Select,
-    SelectTrigger,
-    SelectValue,
     SelectContent,
     SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
-import { LoadImagesButton } from "@/components/shared/LoadImagesButton";
-import { getProfilesQuery } from "@/mutations/profiles.mutation";
-import { Profile } from "@/models/profile.model";
-import { createIllustration } from "@/actions/illustrations";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
 import { Illustration, ILLUSTRATION_STATUS } from "@/models/illustration.model";
+import { Profile } from "@/models/profile.model";
+import { getProfilesQuery } from "@/mutations/profiles.mutation";
+import { resetIllustrationAtomState, UIIllustrationAtom } from "@/store/ui-illustration.store";
 import { useAtom, useSetAtom } from "jotai";
-import { UIIllustrationAtom, resetIllustrationAtomState } from "@/store/ui-illustration.store";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const imageSchema = z.object({
     name: z.string(),
@@ -131,7 +131,7 @@ export default function RevealIllustrationForm() {
                         name="images"
                         render={() => (
                             <FormItem>
-                                <FormLabel>Imágenes</FormLabel>
+                                <FormLabel>Images</FormLabel>
                                 <FormControl className="hidden">
                                     <Input
                                         type="file"
@@ -312,9 +312,9 @@ export default function RevealIllustrationForm() {
             </Form>
 
             <p className="text-xs text-muted-foreground">
-                Las imágenes generadas son ficticias y no deben usarse con fines médicos
-                o diagnósticos. Los resultados son generados automáticamente y pueden
-                contener contenido ofensivo, inapropiado, irreal u objetable por error.
+                Generated images are fictional and should not be used for medical
+                or diagnostic purposes. Results are automatically generated and may
+                contain offensive, inappropriate, unrealistic, or objectionable content by error.
             </p>
         </div>
     );

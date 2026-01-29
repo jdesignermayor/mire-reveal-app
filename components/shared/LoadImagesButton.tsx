@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  removeImageToBucket,
-  uploadImageToBucket,
+    removeImageToBucket,
+    uploadImageToBucket,
 } from "@/lib/forms.utils";
 import { ImageFormat } from "@/models/illustration.model";
 import { PlusIcon, TrashIcon } from "lucide-react";
@@ -39,12 +39,12 @@ export function LoadImagesButton({
 
     for (const file of Array.from(files)) {
       if (!file.type.startsWith("image/")) {
-        toast.error("Solo se permiten imágenes");
+        toast.error("Only images are allowed");
         continue;
       }
 
       if (file.size > 1 * 1024 * 1024) {
-        toast.error("La imagen no puede superar 1MB");
+        toast.error("Image cannot exceed 1MB");
         continue;
       }
 
@@ -151,7 +151,7 @@ export function LoadImagesButton({
         shouldValidate: true,
       });
     } catch {
-      toast.error("Error eliminando la imagen");
+      toast.error("Error removing image");
     }
   };
 
@@ -179,14 +179,13 @@ export function LoadImagesButton({
           <div className="flex flex-col items-center gap-3">
             <PlusIcon className="size-8 text-muted-foreground" />
             <p className="font-medium">
-              {multiple ? "Subir imágenes" : "Subir imagen"}
+              {multiple ? "Upload images" : "Upload image"}
             </p>
             <p className="text-sm text-muted-foreground">
-              Arrastra o haz clic para seleccionar
+              Drag or click to select
             </p>
             {multiple && <p className="text-xs text-muted-foreground mt-2">
-              Formatos: JPG, PNG, GIF, WebP • Máximo 5 imágenes • Máximo 4MB
-              por imagen
+              Formats: JPG, PNG, GIF, WebP • Maximum 5 images • Maximum 4MB per image
             </p>}
           </div>
         </button>

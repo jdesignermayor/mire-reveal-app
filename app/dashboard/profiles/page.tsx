@@ -12,14 +12,14 @@ export default async function ProfilesPage(){
         <div className="grid gap-8">
             <div className="flex justify-between items-center">
                <div>
-                    <h3 className="text-4xl font-bold">Perfiles</h3>
+                    <h3 className="text-4xl font-bold">Profiles</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                    Aqui podras ver los perfiles recientes, filtrarlos y gestionarlos.
+                    Here you can view recent profiles, filter them, and manage them.
                     </p>
                </div>
                 <Link href="/dashboard/profiles/create">
                     <Button className=" cursor-pointer">
-                        Crear perfil
+                        Create profile
                     </Button>
                 </Link>
             </div>

@@ -2,16 +2,14 @@
 
 import type React from "react"
 
+import { getSettings } from "@/actions/settings"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { supabaseBrowser } from "@/lib/supabase/client"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
-import { getSettings } from "@/actions/settings"
-import { toast } from "sonner"
 
 export function LoginForm() {
   const supabase = supabaseBrowser();
@@ -33,7 +31,7 @@ export function LoginForm() {
   }
 
   const handleLoginError = async () => {
-    setError('Error al iniciar sesion, verifique sus credenciales y contacte al administrador.');
+    setError('Error signing in, please verify your credentials and contact the administrator.');
     await supabase.auth.signOut();
     setIsLoading(false);
   }
@@ -48,13 +46,15 @@ export function LoginForm() {
       const settings = await getSettings();
 
       if (!settings?.company) {
-        handleLoginError();
+        await handleLoginError();
         return;
       }
-      router.replace(redirectPath); // 🚀 redirect after login
+      setError(null);
+      router.replace(redirectPath);
     } else {
       await supabase.auth.signOut();
-      handleLoginError();
+      await handleLoginError();
+      return;
     }
 
     setError(null);
@@ -67,18 +67,18 @@ export function LoginForm() {
         <div className="flex flex-col space-y-3 gap-3">
           <div className="flex flex-col gap-3">
             <Image src="/logo.svg" alt="Logo" width={120} height={100} priority={true} />
-            <p className="text-muted-foreground leading-relaxed">Generador de ecografias hiperrealistas, IA entrenada en datos medicos reales.</p>
+            <p className="text-muted-foreground leading-relaxed">Hyper-realistic ultrasound generator, AI trained on real medical data.</p>
           </div>
           <div>
-            <h1 className="text-4xl font-serif tracking-tight text-foreground">Iniciar sesion</h1>
-            <p className="text-muted-foreground leading-relaxed">Ingresa tus credenciales para acceder a tu cuenta.</p>
+            <h1 className="text-4xl font-serif tracking-tight text-foreground">Sign in</h1>
+            <p className="text-muted-foreground leading-relaxed">Enter your credentials to access your account.</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium">
-              Correo electronico
+              Email
             </Label>
             <Input
               id="email"
@@ -94,7 +94,7 @@ export function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password" className="text-sm font-medium">
-                Contrasena
+                Password
               </Label>
               {/* <a href="#" className="text-sm text-primary hover:underline underline-offset-4">
                 Recordar contrasena?
@@ -112,7 +112,12 @@ export function LoginForm() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm">{error}</div>
+            <p
+              role="alert"
+              className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-md px-4 py-3"
+            >
+              {error}
+            </p>
           )}
           {/* <div className="flex items-center space-x-2">
             <Checkbox
@@ -126,7 +131,7 @@ export function LoginForm() {
           </div> */}
 
           <Button type="submit" className="w-full h-12 text-base font-medium bg-[#A565FF] hover:bg-[#8052cc]">
-            {isLoading ? "Iniciando sesion..." : "Iniciar sesion"}
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </div>

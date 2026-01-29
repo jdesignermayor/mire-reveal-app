@@ -1,6 +1,5 @@
 'use client'
 
-import { AnimatedShinyText } from '@/components/ui/animated-shiny-text'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Json } from '@/lib/supabase/types'
@@ -112,7 +111,7 @@ export default function RevealIllustrationPanel({
         {(updatedStatus === ILLUSTRATION_STATUS.PROCESSING ||
           updatedStatus === ILLUSTRATION_STATUS.PENDING) && (
             <p className="inline-flex text-lg items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
-              <span>✨ Revelando imágenes, espera un momento...</span>
+              <span>✨ Revealing images, please wait a moment...</span>
             </p>
           )}
         {images?.length > 0 && (

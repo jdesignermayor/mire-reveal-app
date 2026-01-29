@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Mire reveal",
-  description: "Generador de ecografias hiperrealistas, IA entrenada en datos medicos reales.",
+  description: "Hyper-realistic ultrasound generator, AI trained on real medical data.",
 };
 
 export default function RootLayout({

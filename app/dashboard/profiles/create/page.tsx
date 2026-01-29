@@ -7,7 +7,7 @@ export default function CreateProfilePage(){
             <div className="flex justify-between items-center">
                 <div>
                     <ProfileDetailBreadcrumb />
-                    <h1 className="text-4xl font-bold">Crear perfil</h1>
+                    <h1 className="text-4xl font-bold">Create profile</h1>
                 </div>
            
             </div>
