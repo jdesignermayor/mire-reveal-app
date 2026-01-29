@@ -9,7 +9,7 @@ export const LandingBody = () => {
     
     {/* TEXTO */}
     <div className="flex flex-col lg:items-start items-center text-center lg:text-left gap-4 lg:justify-center px-4 md:px-0 xl:w-1/2">
-        <h1 className="text-5xl md:text-5xl lg:text-7xl font-bold font-poppins">
+        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-poppins">
             Hiper-Realistic. <br />
             <span>Ultrasound.</span> <br />
             Revolution.
