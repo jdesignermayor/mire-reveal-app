@@ -1,17 +1,14 @@
 "use client"
 
-import { NewBadge } from "./NewBadge"
 
 export const LandingBody = () => {
     return (
         <>
-         <main className="flex flex-col min-h-screen items-center justify-center font-sans dark:bg-black  bg-gradient-to-r from-[#f0f0f0] via-[#f6f7ff] to-[#f6f6f6] ">
+         <main className="flex flex-col min-h-screen items-center justify-center font-sans dark:bg-black bg-white ">
          <div className="flex flex-col-reverse md:flex-row w-full max-w-7xl items-center justify-between h-[80dvh]">
     
     {/* TEXTO */}
     <div className="flex flex-col lg:items-start items-center text-center lg:text-left gap-4 lg:justify-center px-4 md:px-0 xl:w-1/2">
-        <NewBadge />
-
         <h1 className="text-5xl md:text-5xl lg:text-7xl font-bold font-poppins">
             Hiper-Realistic. <br />
             <span>Ultrasound.</span> <br />
@@ -28,7 +25,7 @@ export const LandingBody = () => {
     </div>
 
     {/* VIDEO */}
-    <div className="flex flex-col px-4 md:px-0 xl:w-2/3">
+    <div className="flex flex-col px-4 md:px-0 xl:w-2/3 mt-10 md:mt-0">
         <div className="relative mx-auto aspect-square rounded-full overflow-hidden h-[30dvh] md:h-[40dvh] lg:h-[50dvh]">
             
             {/* VIDEO */}
