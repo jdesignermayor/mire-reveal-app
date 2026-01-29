@@ -16,7 +16,7 @@ export const LandingBody = () => {
         </h1>
 
         <p className="text-lg md:text-xl lg:text-2xl font-poppins max-w-lg">
-            Experience the future of ultrasound with Hiper-Realistic and the most realistic and accurate ultrasound images.
+        Using cutting-edge technology, we capture your baby’s most precious details before birth, creating a high-definition illustration in real time.
         </p>
 
         <button className="relative group bg-gradient-to-r from-[#7e96ff] to-[#6b8cff] text-white px-6 py-3 rounded-2xl text-2xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-[#3e62ff]/25 hover:scale-105 active:scale-95">
