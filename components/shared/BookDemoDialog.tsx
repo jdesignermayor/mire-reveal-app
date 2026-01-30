@@ -20,10 +20,11 @@ export function BookDemoDialog({ trigger }: BookDemoDialogProps) {
         showCloseButton={true}
       >
         <DialogTitle className="sr-only">Book a demo</DialogTitle>
-        <div 
-          className="calendly-inline-widget"
-          data-url="https://calendly.com/jdesignermayor/mire-reveal-demo"
-          style={{ minWidth: '320px', height: '700px', width: '100%' }}
+        <iframe
+          src="https://calendly.com/jdesignermayor/mire-reveal-demo?embed=true&embed_type=inline"
+          title="Book a demo - Mire Reveal"
+          className="w-full h-full border-0"
+          style={{ minWidth: '320px', height: '700px' }}
         />
       </DialogContent>
     </Dialog>
