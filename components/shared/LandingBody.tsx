@@ -32,7 +32,7 @@ export const LandingBody = () => {
 
                     {/* VIDEO */}
                     <div className="flex flex-col px-4 md:px-0 xl:w-2/3 mt-10 md:mt-0">
-                        <div className="relative mx-auto aspect-square rounded-full overflow-hidden h-[30dvh] md:h-[40dvh] lg:h-[50dvh]">
+                        <div className="relative mx-auto aspect-square rounded-full overflow-hidden h-[30dvh] md:h-[40dvh] lg:h-[75dvh] xl:h-[50dvh]">
 
                             {/* VIDEO */}
                             <video
@@ -57,41 +57,7 @@ export const LandingBody = () => {
                             />
                         </div>
                     </div>
-
                 </div>
-                {/* <div className="flex flex-col w-full h-[90dvh] bg-black">
-                <div className="flex flex-col gap-15 items-center justify-center text-white py-[10rem]">
-                  <div className="flex flex-col gap-4 items-center justify-center">
-                    <h2 className="text-6xl font-medium font-poppins">Why choose us?</h2>
-                    <p className="text-white/90 text-lg">We are the most realistic and accurate ultrasound images in the market.</p>
-                  </div>
-                    <div className="flex gap-4 items-stretch justify-center">
-                        <SpotlightCard className="max-w-md min-h-[35dvh] flex flex-col bg-black">
-                            <div className="flex flex-col gap-4 flex-1">
-                                <CheckCheckIcon size={40} className="shrink-0" />
-                                <p className="text-white font-semibold text-4xl shrink-0">Highest Quality</p>
-                                <p className="text-white/90 text-lg">We use the latest technology to create the most realistic and accurate ultrasound images in the market.</p>
-                            </div>
-                        </SpotlightCard>
-                        <SpotlightCard className="max-w-md min-h-[35dvh] flex flex-col">
-                            <div className="flex flex-col gap-4 flex-1">
-                                <StarIcon size={40} className="shrink-0" />
-                                <p className="text-white font-semibold text-4xl shrink-0">Intuitive Interface</p>
-                                <p className="text-white/90 text-lg">We use the latest technology to create the most realistic and accurate ultrasound images in the market.</p>
-                                <p className="text-white/90 text-lg">We deliver the images to you in just a few minutes.</p>
-                            </div>
-                        </SpotlightCard>
-                        <SpotlightCard className="max-w-md min-h-[35dvh] flex flex-col">
-                            <div className="flex flex-col gap-4 flex-1">
-                                <TimerIcon size={40} className="shrink-0" />
-                                <p className="text-white font-semibold text-4xl shrink-0">Support 24/7</p>
-                                <p className="text-white/90 text-lg">We use the latest technology to create the most realistic and accurate ultrasound images in the market.</p>
-                                <p className="text-white/90 text-lg">We are available 24/7 to help you with any questions you may have.</p>
-                            </div>
-                        </SpotlightCard>
-                    </div>
-                </div>
-            </div> */}
             </main>
         </>
     )
