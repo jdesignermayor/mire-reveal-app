@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -13,25 +12,8 @@ type BookDemoDialogProps = {
 };
 
 export function BookDemoDialog({ trigger }: BookDemoDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (isOpen && typeof window !== 'undefined' && window.Calendly) {
-      // Give Calendly time to initialize the widget
-      const timer = setTimeout(() => {
-        window.Calendly.initInlineWidget({
-          url: 'https://calendly.com/jdesignermayor/mire-reveal-demo',
-          parentElement: document.querySelector('.calendly-inline-widget') as HTMLElement,
-          prefill: {},
-        });
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent
         className="max-w-[95vw] w-full max-h-[90vh] h-[90vh] sm:max-w-[900px] p-0 overflow-hidden"
