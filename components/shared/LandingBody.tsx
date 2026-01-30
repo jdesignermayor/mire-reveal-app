@@ -32,17 +32,29 @@ export const LandingBody = () => {
 
                     {/* VIDEO */}
                     <div className="flex flex-col px-4 md:px-0 xl:w-2/3 mt-10 md:mt-0">
-                        <div className="relative mx-auto aspect-square rounded-full overflow-hidden h-[30dvh] md:h-[40dvh] lg:h-[75dvh] xl:h-[50dvh]">
+                        <div className="relative mx-auto aspect-square rounded-full overflow-hidden h-[30dvh] md:h-[40dvh] lg:h-[75dvh] xl:h-[70dvh]">
 
                             {/* VIDEO */}
                             <video
-                                src="/demos/herovideo.mp4"
                                 autoPlay
                                 loop
                                 muted
                                 playsInline
+                                preload="auto"
                                 className="absolute inset-0 h-full w-full object-cover"
-                            />
+                                onError={(e) => {
+                                    console.error('Video failed to load:', e);
+                                    const target = e.target as HTMLVideoElement;
+                                    // Try to reload the video
+                                    if (target.src) {
+                                        target.load();
+                                    }
+                                }}
+                            >
+                                <source src="/demos/herovideo.webm" type="video/webm" />
+                                <source src="/demos/herovideo.mp4" type="video/mp4" />
+                                Tu navegador no soporta el tag de video.
+                            </video>
 
                             {/* BORDE */}
                             <div className="pointer-events-none absolute inset-0 rounded-full" />
