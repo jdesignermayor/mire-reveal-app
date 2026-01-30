@@ -1,5 +1,6 @@
 "use client"
 
+import { BookDemoDialog } from "./BookDemoDialog"
 
 export const LandingBody = () => {
     return (
@@ -19,9 +20,16 @@ export const LandingBody = () => {
         Using cutting-edge technology, we capture your baby’s most precious details before birth, creating a high-definition illustration in real time.
         </p>
 
-        <button className="relative group bg-gradient-to-r from-[#7e96ff] to-[#6b8cff] text-white px-6 py-3 rounded-2xl text-2xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-[#3e62ff]/25 hover:scale-105 active:scale-95">
-            Book a demo
-        </button>
+        <BookDemoDialog
+            trigger={
+                <button
+                    type="button"
+                    className="relative group inline-flex bg-gradient-to-r from-[#7e96ff] to-[#6b8cff] text-white px-6 py-3 rounded-2xl text-2xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-[#3e62ff]/25 hover:scale-105 active:scale-95"
+                >
+                    Book a demo
+                </button>
+            }
+        />
     </div>
 
     {/* VIDEO */}
