@@ -7,9 +7,11 @@ export const LandingBody = () => {
         <>
             <main className="flex flex-col min-h-screen items-center justify-center font-sans dark:bg-black bg-white ">
                 <div className="flex flex-col-reverse md:flex-row w-full max-w-4xl 2xl:max-w-7xl items-center justify-between h-[80dvh]">
+                    
+                    {/* TEXT */}
                     <div className="flex flex-col lg:items-start items-center text-center lg:text-left gap-4 lg:justify-center px-4 md:px-0 xl:w-1/2">
                         <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-7xl font-bold font-poppins">
-                            Hiper-Realistic. <br />
+                            Hyper-Realistic. <br />
                             <span>Ultrasound.</span> <br />
                             Revolution.
                         </h1>
@@ -33,8 +35,7 @@ export const LandingBody = () => {
                     {/* VIDEO */}
                     <div className="flex flex-col px-4 md:px-0 xl:w-2/3 mt-10 md:mt-0">
                         <div className="relative mx-auto aspect-square rounded-full overflow-hidden h-[30dvh] md:h-[40dvh] lg:h-[75dvh] xl:h-[70dvh]">
-
-                            {/* VIDEO */}
+                            
                             <video
                                 autoPlay
                                 loop
@@ -43,32 +44,32 @@ export const LandingBody = () => {
                                 preload="auto"
                                 className="absolute inset-0 h-full w-full object-cover"
                                 onError={(e) => {
-                                    console.error('Video failed to load:', e);
-                                    const target = e.target as HTMLVideoElement;
-                                    // Try to reload the video
+                                    console.error("Video failed to load:", e)
+                                    const target = e.target as HTMLVideoElement
                                     if (target.src) {
-                                        target.load();
+                                        target.load()
                                     }
                                 }}
                             >
                                 <source src="/demos/herovideo.webm" type="video/webm" />
                                 <source src="/demos/herovideo.mp4" type="video/mp4" />
-                                Tu navegador no soporta el tag de video.
+                                Your browser does not support the video tag.
                             </video>
 
-                            {/* BORDE */}
+                            {/* BORDER */}
                             <div className="pointer-events-none absolute inset-0 rounded-full" />
 
                             {/* SOFT WHITE FADE */}
                             <div
                                 className="
-                    pointer-events-none
-                    absolute inset-0 rounded-full
-                    shadow-[inset_0_0_28px_rgba(255,255,255,0.65)]
-                "
+                                    pointer-events-none
+                                    absolute inset-0 rounded-full
+                                    shadow-[inset_0_0_28px_rgba(255,255,255,0.65)]
+                                "
                             />
                         </div>
                     </div>
+
                 </div>
             </main>
         </>
