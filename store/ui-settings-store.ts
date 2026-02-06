@@ -5,19 +5,19 @@ const initialValue: UISettings = {
   menuOptions: [
     {
       isActive: true,
-      label: "Inicio",
+      label: "Home",
       icon: "home",
       link: "/dashboard",
     },
     {
       isActive: false,
-      label: "Perfiles",
+      label: "Profiles",
       icon: "user-round",
       link: "/dashboard/profiles",
     },
     {
       isActive: false,
-      label: "Configuración",
+      label: "Settings",
       icon: "settings",
       link: "/dashboard/settings",
     },

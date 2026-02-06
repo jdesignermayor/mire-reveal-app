@@ -107,7 +107,7 @@ export default function IllustrationCard({ illustration }: { illustration: Illus
 
     return <Card
         key={illustration.id}
-        className="min-w-72 border rounded-md p-2 cursor-pointer hover:bg-gray-100 transition-all shadow-none"
+        className="min-w-72 border rounded-md p-2 cursor-pointer hover:opacity-80 transition-all shadow-none"
         onClick={() => handleIllustrationClick(illustration)}
     >
         <CardContent className="p-0">

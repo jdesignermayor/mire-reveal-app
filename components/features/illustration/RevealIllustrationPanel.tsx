@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Json } from '@/lib/supabase/types'
 import { cn } from '@/lib/utils'
 import { ILLUSTRATION_STATUS, ImageDataFormat } from '@/models/illustration.model'
-import { useIllustration } from '@/mutations/illustration.query'
+import { useIllustration } from '@/mutations/illustration.mutation'
 import { AlertCircleIcon, CheckIcon, RefreshCcwIcon } from 'lucide-react'
 import Image from 'next/image'
 

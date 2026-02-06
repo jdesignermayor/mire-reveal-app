@@ -34,6 +34,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { generateIllustrationMutation } from "@/mutations/illustration.mutation";
 
 const imageSchema = z.object({
     name: z.string(),
@@ -70,6 +71,8 @@ export default function RevealIllustrationForm() {
     const { data } = getProfilesQuery();
     const profiles = data?.profiles;
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const illustrationMutation = generateIllustrationMutation();
+
     const resetIllustrationState = useSetAtom(resetIllustrationAtomState);
     const [, setIllustration] = useAtom(UIIllustrationAtom);
 
@@ -102,6 +105,8 @@ export default function RevealIllustrationForm() {
             const illustration = await createIllustration(values);
 
             toast.success("Ecografía hiperrealista cargada correctamente, espere a que se procese...");
+
+            illustrationMutation.mutate(illustration);
             handleRedirection(illustration);
         } catch (error) {
             console.error("Error submitting illustration:", error);

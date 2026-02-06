@@ -6,7 +6,6 @@ import { Database } from "@/lib/supabase/types";
 import { getSettings } from "./settings";
 import { IllustrationFormData } from "@/components/features/illustration/RevealIllustrationForm";
 import { Illustration, ILLUSTRATION_STATUS, ImageDataFormat, ImageFormat, ImageUploaded } from "@/models/illustration.model";
-import { after } from "next/server";
 
 const UNPROCESSED_IMAGES_BUCKET = "profile_assets";
 
@@ -14,8 +13,7 @@ type Json = Database['public']['Tables']['tbl_illustrations']['Row']['images'];
 
 type IllustrationInsert = Omit<Illustration, "id" | "created_at">;
 
-
-type IllustrationResponse = Illustration & { id: number };
+export type IllustrationResponse = Illustration & { id: number };
 
 async function getUserName(userId: string | null): Promise<string> {
     if (!userId) return "Usuario Desconocidos";
@@ -89,79 +87,79 @@ const processedImageData: ImageUploaded = {
     fullPath: "public/demo-image-transformed.jpg",
 };
 
-// Función para procesar imagen con Gemini API
-async function processImageWithGemini(image: ImageUploaded): Promise<ImageUploaded> {
-    try {
-        console.log('Processing image with Gemini:', image.publicUrl);
+// // Función para procesar imagen con Gemini API
+// async function processImageWithGemini(image: ImageUploaded): Promise<ImageUploaded> {
+//     try {
+//         console.log('Processing image with Gemini:', image.publicUrl);
         
-        // Importar Google Generative AI
-        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+//         // Importar Google Generative AI
+//         const { GoogleGenerativeAI } = await import('@google/generative-ai');
         
-        // Inicializar Gemini con la API key desde variables de entorno
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+//         // Inicializar Gemini con la API key desde variables de entorno
+//         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
         
-        // Usar modelo gratuito gemini-1.5-flash para image-to-image
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+//         // Usar modelo gratuito gemini-1.5-flash para image-to-image
+//         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
         
-        // Descargar la imagen desde la URL
-        const imageResponse = await fetch(image.publicUrl);
-        if (!imageResponse.ok) {
-            throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-        }
+//         // Descargar la imagen desde la URL
+//         const imageResponse = await fetch(image.publicUrl);
+//         if (!imageResponse.ok) {
+//             throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+//         }
         
-        const imageBuffer = await imageResponse.arrayBuffer();
-        const base64Image = Buffer.from(imageBuffer).toString('base64');
+//         const imageBuffer = await imageResponse.arrayBuffer();
+//         const base64Image = Buffer.from(imageBuffer).toString('base64');
         
-        // Prompt específico para transformar ecografía a ilustración artística
-        const prompt = `
-        Transform this fetal ultrasound image into a beautiful, artistic baby illustration.
-        Make it:
-        - Clear and visible baby features
-        - Soft, artistic style
-        - Warm and gentle appearance
-        - Appropriate for parents
-        - Maintain the essence but make it artistic
+//         // Prompt específico para transformar ecografía a ilustración artística
+//         const prompt = `
+//         Transform this fetal ultrasound image into a beautiful, artistic baby illustration.
+//         Make it:
+//         - Clear and visible baby features
+//         - Soft, artistic style
+//         - Warm and gentle appearance
+//         - Appropriate for parents
+//         - Maintain the essence but make it artistic
         
-        Return a description of the transformed image that would be suitable for creating an artistic illustration.
-        `;
+//         Return a description of the transformed image that would be suitable for creating an artistic illustration.
+//         `;
         
-        // Llamar a Gemini API con la imagen y el prompt
-        const result = await model.generateContent([
-            prompt,
-            {
-                inlineData: {
-                    data: base64Image,
-                    mimeType: 'image/jpeg'
-                }
-            }
-        ]);
+//         // Llamar a Gemini API con la imagen y el prompt
+//         const result = await model.generateContent([
+//             prompt,
+//             {
+//                 inlineData: {
+//                     data: base64Image,
+//                     mimeType: 'image/jpeg'
+//                 }
+//             }
+//         ]);
         
-        const response = await result.response;
-        const processedDescription = response.text();
+//         const response = await result.response;
+//         const processedDescription = response.text();
         
-        console.log('Gemini processed image description:', processedDescription);
+//         console.log('Gemini processed image description:', processedDescription);
         
-        // Generar nombre único para la imagen procesada
-        const timestamp = Date.now();
-        const processedPath = `gemini_processed_${timestamp}_${image.path}`;
-        const processedPublicUrl = `/processed/${processedPath}`;
+//         // Generar nombre único para la imagen procesada
+//         const timestamp = Date.now();
+//         const processedPath = `gemini_processed_${timestamp}_${image.path}`;
+//         const processedPublicUrl = `/processed/${processedPath}`;
         
-        // NOTA: Gemini 1.5-flash no genera imágenes directamente
-        // Retorna descripciones textuales. Para generar imágenes reales,
-        // necesitarías usar otro servicio como DALL-E, Midjourney, o Stable Diffusion
-        // Por ahora, simulamos la URL de la imagen procesada
+//         // NOTA: Gemini 1.5-flash no genera imágenes directamente
+//         // Retorna descripciones textuales. Para generar imágenes reales,
+//         // necesitarías usar otro servicio como DALL-E, Midjourney, o Stable Diffusion
+//         // Por ahora, simulamos la URL de la imagen procesada
         
-        return {
-            path: processedPath,
-            publicUrl: processedPublicUrl,
-            fullPath: `processed_${image.fullPath}`,
-        };
+//         return {
+//             path: processedPath,
+//             publicUrl: processedPublicUrl,
+//             fullPath: `processed_${image.fullPath}`,
+//         };
         
-    } catch (error) {
-        console.error('Error processing image with Gemini:', error);
-        throw new Error(`Gemini API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-}
+//     } catch (error) {
+//         console.error('Error processing image with Gemini:', error);
+//         throw new Error(`Gemini API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+//     }
+// }
 
 export async function createIllustration(illustrationData: IllustrationFormData): Promise<IllustrationResponse> {
     const supabase = await supabaseServer();
@@ -247,133 +245,6 @@ export async function createIllustration(illustrationData: IllustrationFormData)
     if (error) {
         throw new Error(error.message);
     }
-
-    // create background job to process image generation in Gemini API
-    after(() => {
-        console.log('scheduled illustration processing:', data.id);
-
-        setTimeout(async () => {
-            console.log('updating illustration status to processing id:', data.id);
-
-            const { error } = await supabase
-                .from(DBTableList.ILLUSTRATIONS)
-                .update({
-                    process_status: ILLUSTRATION_STATUS.PROCESSING,
-                })
-                .eq("id", data.id);
-
-            if (error) {
-                console.error('Error updating illustration status:', error);
-                return;
-            }
-
-            // Procesar cada imagen individualmente
-            imageData.forEach((image, index) => {
-                setTimeout(async () => {
-                    console.log(`processing image ${index} with Gemini API for illustration:`, data.id);
-                    
-                    try {
-                        // Llamar a Gemini API para procesar la imagen
-                        const processedImage = await processImageWithGemini(image.images.unprocessed);
-                        
-                        // Obtener datos actuales de la ilustración
-                        const { data: currentIllustration, error: fetchError } = await supabase
-                            .from(DBTableList.ILLUSTRATIONS)
-                            .select('images')
-                            .eq("id", data.id)
-                            .single();
-
-                        if (fetchError) {
-                            console.error(`Error fetching current illustration ${index}:`, fetchError);
-                            return;
-                        }
-
-                        // Actualizar la imagen específica
-                        const currentImages = currentIllustration.images;
-                        if (!Array.isArray(currentImages)) {
-                            console.error(`Invalid images data for illustration ${index}`);
-                            return;
-                        }
-
-                        const updatedImages = currentImages.map((img: any) => {
-                            if (img && img.id === image.id) {
-                                return {
-                                    ...img,
-                                    isPending: false,
-                                    isFailed: false,
-                                    isFinished: true,
-                                    images: {
-                                        unprocessed: img.images?.unprocessed,
-                                        processed: processedImage,
-                                    },
-                                };
-                            }
-                            return img;
-                        });
-
-                        const { error: updateError } = await supabase
-                            .from(DBTableList.ILLUSTRATIONS)
-                            .update({
-                                images: updatedImages as unknown as Json,
-                            })
-                            .eq("id", data.id);
-
-                        if (updateError) {
-                            console.error(`Error updating processed image ${index}:`, updateError);
-                        } else {
-                            console.log(`Successfully processed and updated image ${index}`);
-                        }
-                    } catch (geminiError) {
-                        console.error(`Gemini API error for image ${index}:`, geminiError);
-                        
-                        // Marcar como fallida si Gemini falla
-                        const { data: currentIllustration, error: fetchError } = await supabase
-                            .from(DBTableList.ILLUSTRATIONS)
-                            .select('images')
-                            .eq("id", data.id)
-                            .single();
-
-                        if (fetchError) {
-                            console.error(`Error fetching current illustration for failed image ${index}:`, fetchError);
-                            return;
-                        }
-
-                        const currentImages = currentIllustration.images;
-                        if (!Array.isArray(currentImages)) {
-                            console.error(`Invalid images data for failed illustration ${index}`);
-                            return;
-                        }
-
-                        const updatedImages = currentImages.map((img: any, i: number) => {
-                            if (i === index) {
-                                return {
-                                    ...img,
-                                    isPending: false,
-                                    isFailed: true,
-                                    images: {
-                                        unprocessed: img.images?.unprocessed,
-                                        processed: img.images?.processed,
-                                    },
-                                };
-                            }
-                            return img;
-                        });
-
-                        const { error: updateError } = await supabase
-                            .from(DBTableList.ILLUSTRATIONS)
-                            .update({
-                                images: updatedImages as unknown as Json,
-                            })
-                            .eq("id", data.id);
-
-                        if (updateError) {
-                            console.error(`Error marking image ${index} as failed:`, updateError);
-                        }
-                    }
-                }, 5000 + (index * 2000)); // Escalonar cada 2 segundos por imagen
-            });
-        }, 5000);
-    });
 
     return {
         id: data.id,
