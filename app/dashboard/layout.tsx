@@ -14,12 +14,12 @@ export default async function DashboardLayout({
   }
   
   return (
-      <div className="relative h-[calc(95vh)]">
+      <div className="relative h-[calc(95vh)] dark">
         <div className="flex ">
           <div>
             <GeneralMenu settings={settings} isAdmin={isAdmin} />
           </div>
-          <div className="flex justify-center w-full ">
+          <div className="flex justify-center w-full dark">
             <div className="flex w-full h-full">
               <div className="w-full"><QueryProvider>{children}</QueryProvider></div>
             </div>

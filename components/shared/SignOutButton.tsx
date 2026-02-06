@@ -1,5 +1,5 @@
 import { onSignOut } from "@/lib/auth.utils";
-import { PlusIcon } from "lucide-react";
+import { LogOutIcon, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
@@ -12,7 +12,7 @@ export default function SignOutButton(){
     }
 
     return <Button variant={"outline"} className="w-full cursor-pointer"  onClick={handleSignOut}>
-        <PlusIcon />
-        Cerrar sesión
+        <LogOutIcon />
+        Sign out
     </Button>
 }

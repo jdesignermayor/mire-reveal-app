@@ -12,7 +12,21 @@ import SignOutButton from "./SignOutButton";
 import { useEffect } from "react";
 import CompanyLogoPanel from "./CompanyLogoPanel";
 import { GetSettingsType } from "@/actions/settings";
-
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/animate-ui/components/radix/sidebar";
 
 export default function GeneralMenu({ settings, isAdmin }: { settings: GetSettingsType, isAdmin: boolean }) {
   const [uiSettings, setUiSettings] = useAtom(UISettingsAtom);
@@ -48,75 +62,78 @@ export default function GeneralMenu({ settings, isAdmin }: { settings: GetSettin
   }, [settings]);
 
   return (
-    <div className="flex flex-col w-72 h-[calc(100vh)] border-r p-6 gap-56">
-      <div className="flex flex-col gap-6">
-        <div className="font-bold flex gap-2 h-10">
-            <CompanyLogoPanel settings={settings} />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Link href="/dashboard/create-illustration" onClick={resetMenu}>
-            <Button className="w-full cursor-pointer bg-[#A565FF] hover:bg-[#9B4DFF] text-white">
-              <PaintbrushIcon />
-              Revelar ecografía hiperrealista
-            </Button>
-          </Link>
-        </div>
-        <div>
-          <ul className="flex flex-col pt-3 gap-1">
-            {menuOptionsWithActiveState.map((option) => {
-              return (
-                <li key={option.label}>
-                  <Link
-                    href={option.link}
-                    prefetch={false}
-                    onClick={handleMenuOptionClick}
-                    shallow={true}
-                  >
-                    <Button
-                      variant={"ghost"}
-                      size="lg"
-                      aria-label="Submit"
-                      className={
-                        "w-full flex justify-start cursor-pointer gap-3" +
-                        (option.isActive ? " bg-gray-100  text-[#A565FF] hover:text-[#A565FF]" : " text-gray-500 ")
-                      }
+    <SidebarProvider>
+      <Sidebar variant="inset" className="dark">
+        <SidebarHeader className="">
+          <div className="flex flex-col gap-6">
+            <div className="font-bold flex gap-2 h-10">
+              <CompanyLogoPanel settings={settings} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Link href="/dashboard/create-illustration" onClick={resetMenu}>
+                <Button className="w-full cursor-pointer bg-primary ">
+                  <PaintbrushIcon />
+                  Reveal ultrasound
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </SidebarHeader>
+
+        <SidebarContent className="">
+          <SidebarGroup className="">
+            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {menuOptionsWithActiveState.map((option) => (
+                  <SidebarMenuItem key={option.label}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={option.isActive}
+                      tooltip={option.label}
+                      className="text-slate-300 hover:text-white  data-[active=true]:text-white"
                     >
-                      <DynamicIcon name={option.icon} className={" size-5 "} />
-                      <p className={option.isActive ? "text-[#A565FF]" : " text-black "}>{option.label}</p>
-                    </Button>
-                  </Link>
-                </li>
-              );
-            })}
-            {isAdmin && (
-              <li>
-                <Link
-                  href="/dashboard/admin"
-                  prefetch={false}
-                  onClick={handleMenuOptionClick}
-                  shallow={true}
-                >
-                  <Button
-                    variant={"ghost"}
-                    size="lg"
-                    aria-label="Submit"
-                    className={
-                      "w-full flex justify-start cursor-pointer gap-3" +
-                      (pathname === "/dashboard/admin" ? " bg-gray-100  text-[#A565FF] hover:text-[#A565FF]" : " text-gray-500 ")
-                    }
-                  >
-                    <DynamicIcon name="settings" className={" size-5 "} />
-                    <p className={pathname === "/dashboard/admin" ? "text-[#A565FF]" : " text-black "}>Admin</p>
-                  </Button>
-                </Link>
-              </li>
-            )}
-          </ul>
-        </div>
-        <div>
+                      <Link
+                        href={option.link}
+                        prefetch={false}
+                        onClick={handleMenuOptionClick}
+                        shallow={true}
+                      >
+                        <DynamicIcon name={option.icon} className="size-5 text-slate-400" />
+                        <span>{option.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === "/dashboard/admin"}
+                      tooltip="Admin"
+                      className="text-slate-300 hover:text-white  data-[active=true]:text-white"
+                    >
+                      <Link
+                        href="/dashboard/admin"
+                        prefetch={false}
+                        onClick={handleMenuOptionClick}
+                        shallow={true}
+                      >
+                        <DynamicIcon name="settings" className="size-5 text-slate-400" />
+                        <span>Admin</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+
+        <SidebarFooter >
           <SignOutButton />
-        </div>
-      </div>
-    </div>
+        </SidebarFooter>
+      </Sidebar>
+    </SidebarProvider>
   );
 }
