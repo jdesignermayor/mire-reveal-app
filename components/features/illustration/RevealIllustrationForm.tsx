@@ -318,8 +318,7 @@ export default function RevealIllustrationForm() {
 
             <p className="text-xs text-muted-foreground">
                 Generated images are fictional and should not be used for medical
-                or diagnostic purposes. Results are automatically generated and may
-                contain offensive, inappropriate, unrealistic, or objectionable content by error.
+                or diagnostic purposes.
             </p>
         </div>
     );

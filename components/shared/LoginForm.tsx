@@ -79,7 +79,7 @@ export function LoginForm() {
                     width={80} 
                     height={67} 
                     priority={true}  
-                    className="brightness-0 dark:brightness-100" 
+                    className="invert brightness-0" 
                   />
                 </div>
               </div>

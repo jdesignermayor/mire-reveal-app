@@ -7,7 +7,7 @@ import SignInButton from "./SignInButton";
 export default async function MainNabvar() {
     return <nav className="flex w-full items-center justify-center max-w-7xl mx-auto px-4 py-4 fixed top-0 left-0 right-0 z-50 ">
         <ul className="flex justify-between items-center w-full">
-            <li><Image src="/logo.svg" alt="Logo" width={100} height={90} priority={true} className="brightness-0" /></li>
+            <li><Image src="/logo.svg" alt="Logo" width={100} height={90} priority={true} className="invert brightness-0 " /></li>
             <li className="flex gap-3">
                 <Suspense fallback={<div>Loading...</div>}>
                     <SignInButton />
