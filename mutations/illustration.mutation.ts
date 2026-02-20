@@ -118,30 +118,31 @@ export function useIllustration(illustrationId: number) {
     return query
 }
 
-export function generateIllustrationMutation() {
+export function generateAIllustrationMutation() {
     return useMutation({
         mutationFn: async (illustration: IllustrationResponse) => {
-            try {
-                const res = await fetch("/api/illustration", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        ...illustration,
-                    }),
-                });
+            console.log('illustration', illustration)
+            // try {
+            //     const res = await fetch("/api/illustration", {
+            //         method: "POST",
+            //         headers: {
+            //             "Content-Type": "application/json",
+            //         },
+            //         body: JSON.stringify({
+            //             ...illustration,
+            //         }),
+            //     });
 
-                if (!res.ok) {
-                    const errorBody = await res.json().catch(() => null)
-                    throw new Error(
-                        errorBody?.error || "Error al generar la ilustración"
-                    )
-                }
-                return res.json() as Promise<IllustrationResponse>;
-            } catch (error) {
-                throw error;
-            }
+            //     if (!res.ok) {
+            //         const errorBody = await res.json().catch(() => null)
+            //         throw new Error(
+            //             errorBody?.error || "Error al generar la ilustración"
+            //         )
+            //     }
+            //     return res.json() as Promise<IllustrationResponse>;
+            // } catch (error) {
+            //     throw error;
+            // }
         },
     });
 }

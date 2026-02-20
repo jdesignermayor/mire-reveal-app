@@ -16,6 +16,7 @@ import {
 
 import { createIllustration } from "@/actions/illustrations";
 import { LoadImagesButton } from "@/components/shared/LoadImagesButton";
+import UnsavedChangesDialog from "@/components/shared/UnsavedChangesDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,7 +35,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { generateIllustrationMutation } from "@/mutations/illustration.mutation";
+import { generateAIllustrationMutation } from "@/mutations/illustration.mutation";
 
 const imageSchema = z.object({
     name: z.string(),
@@ -71,18 +72,29 @@ export default function RevealIllustrationForm() {
     const { data } = getProfilesQuery();
     const profiles = data?.profiles;
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const illustrationMutation = generateIllustrationMutation();
+    const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+    const generateAIllustration = generateAIllustrationMutation();
 
     const resetIllustrationState = useSetAtom(resetIllustrationAtomState);
-    const [, setIllustration] = useAtom(UIIllustrationAtom);
+    const [illustrationState, setIllustrationState] = useAtom(UIIllustrationAtom);
 
     const handleRedirection = (illustration: Illustration) => {
         router.replace(`/dashboard/create-illustration/${illustration.id}`);
-        setIllustration({
+        setIllustrationState({
             illustration,
             updatedImages: [],
             updatedStatus: ILLUSTRATION_STATUS.PENDING,
         });
+    };
+
+    const handleDiscardChanges = () => {
+        setShowUnsavedDialog(false);
+        resetIllustrationState();
+    };
+
+    const handleSaveChanges = async () => {
+        setShowUnsavedDialog(false);
+        await form.handleSubmit(onSubmit)();
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -106,7 +118,7 @@ export default function RevealIllustrationForm() {
 
             toast.success("Ecografía hiperrealista cargada correctamente, espere a que se procese...");
 
-            illustrationMutation.mutate(illustration);
+            generateAIllustration.mutate(illustration);
             handleRedirection(illustration);
         } catch (error) {
             console.error("Error submitting illustration:", error);
@@ -117,14 +129,23 @@ export default function RevealIllustrationForm() {
     }
 
     useEffect(() => {
-        // Reset illustration atom state when component mounts
-        resetIllustrationState();
-
-        // Cleanup function when component unmounts
         return () => {
-            resetIllustrationState();
+            const { illustration } = illustrationState;
+           
+            if(!illustration){
+                setShowUnsavedDialog(true);
+            }
+            // if (illustration?.illustration?.process_status === ILLUSTRATION_STATUS.PENDING) {
+            //     // Handle pending illustration cleanup if needed
+            //     setShowUnsavedDialog(true);
+            //     return;
+            // }
+
+
+            // resetIllustrationState();
+
         };
-    }, [resetIllustrationState]);
+    }, [illustrationState]);
 
     return (
         <div className="max-w-xl space-y-8">
@@ -320,6 +341,13 @@ export default function RevealIllustrationForm() {
                 Generated images are fictional and should not be used for medical
                 or diagnostic purposes.
             </p>
+
+            <UnsavedChangesDialog
+                open={showUnsavedDialog}
+                onOpenChange={setShowUnsavedDialog}
+                onDiscard={handleDiscardChanges}
+                onSave={handleSaveChanges}
+            />
         </div>
     );
 }

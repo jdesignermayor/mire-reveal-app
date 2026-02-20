@@ -34,6 +34,7 @@ const MasonryCard = ({
       className="break-inside-avoid mb-4 cursor-pointer border-none shadow-none p-0 hover:opacity-80"
       onClick={data.isFinished ? onClick : undefined}
     >
+      <pre>{JSON.stringify(data, null, 2)}</pre>
       {/* Usamos la clase calculada en el estado */}
       <div
         className={`relative group w-full overflow-hidden rounded-lg transition-all duration-500 ${data.isFinished && " ring-offset-2 ring-offset-background ring-3 ring-primary cursor-pointer hover:opacity-40"} ${data.isFailed && " ring-offset-3 ring-offset-background ring-2 ring-red-500 "}`}
@@ -101,11 +102,8 @@ export default function RevealIllustrationPanel({
   const images = data?.images as Array<Json> || []
 
   return (
-    <div>
-      <h1>RevealIllustrationPanel</h1>
-
+    <div className='dark'>
       <div className="max-w-5xl">
-        <p>state: {updatedStatus}</p>
         {/* {JSON.stringify(data)} */}
 
         {(updatedStatus === ILLUSTRATION_STATUS.PROCESSING ||
