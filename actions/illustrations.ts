@@ -6,12 +6,14 @@ import { Database } from "@/lib/supabase/types";
 import { getSettings } from "./settings";
 import { IllustrationFormData } from "@/components/features/illustration/RevealIllustrationForm";
 import { Illustration, ILLUSTRATION_STATUS, ImageDataFormat, ImageFormat, ImageUploaded } from "@/models/illustration.model";
+import { IMAGE_URL_EXPIRE_TIME, processImageWithGemini } from "@/app/api/image-generation/route";
+import { after } from "next/server";
 
 const UNPROCESSED_IMAGES_BUCKET = "profile_assets";
 
 type Json = Database['public']['Tables']['tbl_illustrations']['Row']['images'];
-
 type IllustrationInsert = Omit<Illustration, "id" | "created_at">;
+
 
 export type IllustrationResponse = Illustration & { id: number };
 
@@ -81,86 +83,6 @@ export async function getIllustrationById(id: number) {
     }
 }
 
-const processedImageData: ImageUploaded = {
-    path: "public/demo-image-transformed.jpg",
-    publicUrl: "/images/demo-image-transformed.jpg",
-    fullPath: "public/demo-image-transformed.jpg",
-};
-
-// // Función para procesar imagen con Gemini API
-// async function processImageWithGemini(image: ImageUploaded): Promise<ImageUploaded> {
-//     try {
-//         console.log('Processing image with Gemini:', image.publicUrl);
-        
-//         // Importar Google Generative AI
-//         const { GoogleGenerativeAI } = await import('@google/generative-ai');
-        
-//         // Inicializar Gemini con la API key desde variables de entorno
-//         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-        
-//         // Usar modelo gratuito gemini-1.5-flash para image-to-image
-//         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        
-//         // Descargar la imagen desde la URL
-//         const imageResponse = await fetch(image.publicUrl);
-//         if (!imageResponse.ok) {
-//             throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-//         }
-        
-//         const imageBuffer = await imageResponse.arrayBuffer();
-//         const base64Image = Buffer.from(imageBuffer).toString('base64');
-        
-//         // Prompt específico para transformar ecografía a ilustración artística
-//         const prompt = `
-//         Transform this fetal ultrasound image into a beautiful, artistic baby illustration.
-//         Make it:
-//         - Clear and visible baby features
-//         - Soft, artistic style
-//         - Warm and gentle appearance
-//         - Appropriate for parents
-//         - Maintain the essence but make it artistic
-        
-//         Return a description of the transformed image that would be suitable for creating an artistic illustration.
-//         `;
-        
-//         // Llamar a Gemini API con la imagen y el prompt
-//         const result = await model.generateContent([
-//             prompt,
-//             {
-//                 inlineData: {
-//                     data: base64Image,
-//                     mimeType: 'image/jpeg'
-//                 }
-//             }
-//         ]);
-        
-//         const response = await result.response;
-//         const processedDescription = response.text();
-        
-//         console.log('Gemini processed image description:', processedDescription);
-        
-//         // Generar nombre único para la imagen procesada
-//         const timestamp = Date.now();
-//         const processedPath = `gemini_processed_${timestamp}_${image.path}`;
-//         const processedPublicUrl = `/processed/${processedPath}`;
-        
-//         // NOTA: Gemini 1.5-flash no genera imágenes directamente
-//         // Retorna descripciones textuales. Para generar imágenes reales,
-//         // necesitarías usar otro servicio como DALL-E, Midjourney, o Stable Diffusion
-//         // Por ahora, simulamos la URL de la imagen procesada
-        
-//         return {
-//             path: processedPath,
-//             publicUrl: processedPublicUrl,
-//             fullPath: `processed_${image.fullPath}`,
-//         };
-        
-//     } catch (error) {
-//         console.error('Error processing image with Gemini:', error);
-//         throw new Error(`Gemini API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-//     }
-// }
-
 export async function createIllustration(illustrationData: IllustrationFormData): Promise<IllustrationResponse> {
     const supabase = await supabaseServer();
 
@@ -189,7 +111,7 @@ export async function createIllustration(illustrationData: IllustrationFormData)
 
             const { data } = await supabase.storage
                 .from(UNPROCESSED_IMAGES_BUCKET)
-                .createSignedUrl(path, 60 * 60 * 24 * 365);
+                .createSignedUrl(path, IMAGE_URL_EXPIRE_TIME);
 
             if (!data) {
                 throw new Error("Image not found");
@@ -234,9 +156,11 @@ export async function createIllustration(illustrationData: IllustrationFormData)
         model_id: null,
         company_id: settings.company.id,
         team_id: null,
+        ethnicity: illustrationData.ethnicity,
     } as IllustrationInsert;
 
-    const { data, error } = await supabase
+
+    const { data: createdIllustration, error } = await supabase
         .from(DBTableList.ILLUSTRATIONS)
         .insert(illustrationDetail)
         .select("id")
@@ -246,8 +170,26 @@ export async function createIllustration(illustrationData: IllustrationFormData)
         throw new Error(error.message);
     }
 
+    after(async () => {
+        for (const image of imageData) {
+            const { path } = image.images.unprocessed;
+            try {
+                await processImageWithGemini({
+                    illustrationId: createdIllustration.id,
+                    imageId: image.id,
+                    gestationalWeek: Number(illustrationData.gestationalWeek),
+                    ethnicity: illustrationData.ethnicity,
+                    gender: illustrationData.gender,
+                    imagePath: path,
+                });
+            } catch (error) {
+                console.error(`Error processing image ${image.id}:`, error);
+            }
+        }
+    });
+
     return {
-        id: data.id,
+        id: createdIllustration.id,
         ...illustrationDetail,
     } as IllustrationResponse;
 }
