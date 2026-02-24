@@ -82,7 +82,8 @@ export type Database = {
           created_at: string
           id: number
           illustration_id: string | null
-          model_id: string | null
+          json_response: Json | null
+          model_name: string | null
           price: string | null
           tokens: string | null
           type: string
@@ -91,7 +92,8 @@ export type Database = {
           created_at?: string
           id?: number
           illustration_id?: string | null
-          model_id?: string | null
+          json_response?: Json | null
+          model_name?: string | null
           price?: string | null
           tokens?: string | null
           type: string
@@ -100,7 +102,8 @@ export type Database = {
           created_at?: string
           id?: number
           illustration_id?: string | null
-          model_id?: string | null
+          json_response?: Json | null
+          model_name?: string | null
           price?: string | null
           tokens?: string | null
           type?: string
@@ -114,6 +117,7 @@ export type Database = {
           company_id: number | null
           created_at: string
           description: string | null
+          ethnicity: string | null
           gestational_week: string | null
           id: number
           images: Json | null
@@ -129,6 +133,7 @@ export type Database = {
           company_id?: number | null
           created_at?: string
           description?: string | null
+          ethnicity?: string | null
           gestational_week?: string | null
           id?: number
           images?: Json | null
@@ -144,6 +149,7 @@ export type Database = {
           company_id?: number | null
           created_at?: string
           description?: string | null
+          ethnicity?: string | null
           gestational_week?: string | null
           id?: number
           images?: Json | null
