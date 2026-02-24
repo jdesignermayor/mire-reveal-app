@@ -59,7 +59,7 @@ const StatusImageComponent = ({ processedUrl, unprocessedUrl, status }: StatusIm
     if (status === ILLUSTRATION_STATUS.COMPLETED) {
         return {
             component: <Image
-                src={processedUrl}
+                src={processedUrl !== "./" ? processedUrl : unprocessedUrl}
                 alt="Processed"
                 fill
                 className="object-cover"

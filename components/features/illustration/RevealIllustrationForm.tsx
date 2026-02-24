@@ -33,9 +33,8 @@ import { getProfilesQuery } from "@/mutations/profiles.mutation";
 import { resetIllustrationAtomState, UIIllustrationAtom } from "@/store/ui-illustration.store";
 import { useAtom, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { generateAIllustrationMutation } from "@/mutations/illustration.mutation";
 
 const imageSchema = z.object({
     name: z.string(),
@@ -49,7 +48,7 @@ const formSchema = z.object({
     name: z.string().nonempty("Name is required."),
     description: z.string().optional(),
     gestationalWeek: z.string().nonempty("Gestational week is required."),
-    etnicity: z.enum([
+    ethnicity: z.enum([
         "asian",
         "black",
         "hispanic",
@@ -60,12 +59,13 @@ const formSchema = z.object({
         "mixed",
         "other",
     ]),
+    gender: z.enum(["male", "female"]),
     images: z
         .array(imageSchema)
         .min(1, { message: "At least one image is required." }),
 });
 
-export type IllustrationFormData = z.infer<typeof formSchema>;
+export type  IllustrationFormData = z.infer<typeof formSchema>;
 
 export default function RevealIllustrationForm() {
     const router = useRouter();
@@ -73,10 +73,9 @@ export default function RevealIllustrationForm() {
     const profiles = data?.profiles;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
-    const generateAIllustration = generateAIllustrationMutation();
 
     const resetIllustrationState = useSetAtom(resetIllustrationAtomState);
-    const [illustrationState, setIllustrationState] = useAtom(UIIllustrationAtom);
+    const [, setIllustrationState] = useAtom(UIIllustrationAtom);
 
     const handleRedirection = (illustration: Illustration) => {
         router.replace(`/dashboard/create-illustration/${illustration.id}`);
@@ -90,6 +89,8 @@ export default function RevealIllustrationForm() {
     const handleDiscardChanges = () => {
         setShowUnsavedDialog(false);
         resetIllustrationState();
+        // Allow navigation to proceed
+        setIsSubmitting(false);
     };
 
     const handleSaveChanges = async () => {
@@ -104,7 +105,8 @@ export default function RevealIllustrationForm() {
             name: "",
             description: "",
             gestationalWeek: "26",
-            etnicity: "hispanic",
+            ethnicity: "hispanic",
+            gender: "female",
             images: [],
         },
     });
@@ -117,8 +119,6 @@ export default function RevealIllustrationForm() {
             const illustration = await createIllustration(values);
 
             toast.success("Ecografía hiperrealista cargada correctamente, espere a que se procese...");
-
-            generateAIllustration.mutate(illustration);
             handleRedirection(illustration);
         } catch (error) {
             console.error("Error submitting illustration:", error);
@@ -127,25 +127,6 @@ export default function RevealIllustrationForm() {
             setIsSubmitting(false);
         }
     }
-
-    useEffect(() => {
-        return () => {
-            const { illustration } = illustrationState;
-           
-            if(!illustration){
-                setShowUnsavedDialog(true);
-            }
-            // if (illustration?.illustration?.process_status === ILLUSTRATION_STATUS.PENDING) {
-            //     // Handle pending illustration cleanup if needed
-            //     setShowUnsavedDialog(true);
-            //     return;
-            // }
-
-
-            // resetIllustrationState();
-
-        };
-    }, [illustrationState]);
 
     return (
         <div className="max-w-xl space-y-8">
@@ -254,8 +235,8 @@ export default function RevealIllustrationForm() {
                         )}
                     />
 
-                    {/* Gestational Week + Ethnicity */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Gestational Week + Gender + Ethnicity */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Gestational Week */}
                         <FormField
                             control={form.control}
@@ -283,6 +264,42 @@ export default function RevealIllustrationForm() {
                                             <SelectItem value="30">30 Semanas</SelectItem>
                                             <SelectItem value="31">31 Semanas</SelectItem>
                                             <SelectItem value="32">32 Semanas</SelectItem>
+                                            <SelectItem value="33">33 Semanas</SelectItem>
+                                            <SelectItem value="34">34 Semanas</SelectItem>
+                                            <SelectItem value="35">35 Semanas</SelectItem>
+                                            <SelectItem value="36">36 Semanas</SelectItem>
+                                            <SelectItem value="37">37 Semanas</SelectItem>
+                                            <SelectItem value="38">38 Semanas</SelectItem>
+                                            <SelectItem value="39">39 Semanas</SelectItem>
+                                            <SelectItem value="40">40 Semanas</SelectItem>
+                                            <SelectItem value="41">41 Semanas</SelectItem>
+                                            <SelectItem value="42">42 Semanas</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Gender */}
+                        <FormField
+                            control={form.control}
+                            name="gender"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Género del bebé</FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecciona género" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="female">👧 Niña</SelectItem>
+                                            <SelectItem value="male">👦 Niño</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -293,7 +310,7 @@ export default function RevealIllustrationForm() {
                         {/* Ethnicity */}
                         <FormField
                             control={form.control}
-                            name="etnicity"
+                            name="ethnicity"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Etnia</FormLabel>

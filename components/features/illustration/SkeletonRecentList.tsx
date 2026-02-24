@@ -6,7 +6,5 @@ export default function SkeletonRecentList(){
         <Skeleton className=" w-[18rem] h-62.5" />
         <Skeleton className=" w-[18rem] h-62.5" />
         <Skeleton className=" w-[18rem] h-62.5" />
-        <Skeleton className=" w-[18rem] h-62.5" />
-        <Skeleton className=" w-[18rem] h-62.5" />
     </section>
 }
