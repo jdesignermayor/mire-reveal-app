@@ -1,13 +1,14 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { ScanEyeIcon, ImageIcon, GitCompareArrowsIcon, LucideIcon } from 'lucide-react'
 
 export type UltrasoundTab = 'reveal' | 'original' | 'compare'
 
-const TABS: { id: UltrasoundTab; label: string }[] = [
-  { id: 'reveal', label: '✨ Ecografía revelada' },
-  { id: 'original', label: '📷 Original' },
-  { id: 'compare', label: '🔍 Comparar' },
+const TABS: { id: UltrasoundTab; icon: LucideIcon; label: string }[] = [
+  { id: 'reveal', icon: ScanEyeIcon, label: 'Reveal' },
+  { id: 'original', icon: ImageIcon, label: 'Original' },
+  { id: 'compare', icon: GitCompareArrowsIcon, label: 'Compare' },
 ]
 
 export default function UltrasoundTabs({
@@ -18,19 +19,20 @@ export default function UltrasoundTabs({
   onTabChange: (tab: UltrasoundTab) => void
 }) {
   return (
-    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full p-1 border border-white/20">
+    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-2xl p-1.5 border border-white/20">
       {TABS.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
-            'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300',
+            'flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300',
             activeTab === tab.id
               ? 'bg-white text-black shadow-sm'
               : 'text-white/70 hover:text-white hover:bg-white/10',
           )}
         >
-          {tab.label}
+          <tab.icon className="size-4 shrink-0" />
+          <span className="hidden sm:inline">{tab.label}</span>
         </button>
       ))}
     </div>

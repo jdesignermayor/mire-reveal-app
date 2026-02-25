@@ -1,28 +1,22 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Json } from '@/lib/supabase/types'
 import { cn } from '@/lib/utils'
-import { Illustration, ILLUSTRATION_STATUS, ImageDataFormat } from '@/models/illustration.model'
+import { ILLUSTRATION_STATUS, ImageDataFormat } from '@/models/illustration.model'
 import { useIllustration } from '@/mutations/illustration.mutation'
-import { AlertCircleIcon, CheckIcon, RefreshCcwIcon } from 'lucide-react'
+import { AlertCircleIcon, SparklesIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import confetti from 'canvas-confetti'
 import UltrasoundViewer from './UltrasoundViewer'
 
-const BLUR_DATA_URL =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPk5uSuBwAA5gCg3ColJwAAAABJRU5ErkJggg==";
-
 const MasonryCard = ({
   data,
-  onRetry,
   onClick,
   heightClass,
 }: {
   data: ImageDataFormat;
-  onRetry: (image: ImageDataFormat) => void;
   onClick: () => void;
   heightClass: string;
 }) => {
@@ -48,32 +42,24 @@ const MasonryCard = ({
 
         {data.isFinished && !data.isPending && !data.isFailed ? (
           <div className="absolute bottom-3 left-3 right-3 z-20 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white text-sm font-medium px-3 py-1.5 rounded-full border border-white/20">
-              <CheckIcon className="size-3.5 text-emerald-400" />
-              Revelada
+            <span className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full border border-white/10">
+              <SparklesIcon className="size-3 text-violet-300" />
+              Revealed
             </span>
-            <span className="text-white/60 text-xs">Click para ver</span>
+            <span className="text-white/40 text-xs tracking-wide">Tap to view</span>
           </div>
         ) : data.isFailed ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/50 backdrop-blur-sm">
             <div className="flex items-center gap-2 bg-red-500/20 border border-red-500/40 text-white px-4 py-2 rounded-full text-sm">
               <AlertCircleIcon className="size-4 text-red-400" />
-              Error al generar
+              Generation failed
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="cursor-pointer border-white/30 text-white hover:bg-white/10 backdrop-blur-sm rounded-full"
-              onClick={(e) => { e.stopPropagation(); onRetry(data); }}
-            >
-              <RefreshCcwIcon className="size-3.5" /> Reintentar
-            </Button>
           </div>
         ) : (
           <div className="absolute bottom-3 left-3 z-20">
-            <span className="flex items-center gap-2 bg-black/40 backdrop-blur-sm text-white/80 text-sm px-3 py-1.5 rounded-full border border-white/10">
-              <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
-              {data.isPending ? "Procesando..." : "Generando..."}
+            <span className="flex items-center gap-2 bg-black/40 backdrop-blur-sm text-white/70 text-xs px-3 py-1.5 rounded-full border border-white/10">
+              <span className="size-1.5 rounded-full bg-violet-400 animate-pulse" />
+              {data.isPending ? "Processing..." : "Generating..."}
             </span>
           </div>
         )}
@@ -88,8 +74,6 @@ const MasonryCard = ({
           priority={true}
           fetchPriority="high"
           loading="eager"
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
           src={data.images.unprocessed.publicUrl}
           alt={data.id}
           fill
@@ -100,7 +84,6 @@ const MasonryCard = ({
     </Card>
   );
 };
-
 
 export default function RevealIllustrationPanel({
   illustrationId,
@@ -114,8 +97,15 @@ export default function RevealIllustrationPanel({
   const [showCelebration, setShowCelebration] = useState(false)
   const [celebrationFading, setCelebrationFading] = useState(false)
   const [selectedImage, setSelectedImage] = useState<ImageDataFormat | null>(null)
+  const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerHeight, setContainerHeight] = useState<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach(clearTimeout)
+    }
+  }, [])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -142,18 +132,23 @@ export default function RevealIllustrationPanel({
       updatedStatus === ILLUSTRATION_STATUS.COMPLETED
 
     if (isTransitionToCompleted) {
+      timeoutRefs.current.forEach(clearTimeout)
+      timeoutRefs.current = []
+
       setShowCelebration(true)
 
       const fire = (opts: confetti.Options) => confetti({ ...opts, zIndex: 9999 })
 
       fire({ particleCount: 120, spread: 70, origin: { x: 0.2, y: 0.6 } })
       fire({ particleCount: 120, spread: 70, origin: { x: 0.8, y: 0.6 } })
-      setTimeout(() => fire({ particleCount: 80, spread: 100, origin: { x: 0.5, y: 0.4 } }), 300)
-      setTimeout(() => fire({ particleCount: 60, spread: 120, origin: { x: 0.3, y: 0.5 } }), 600)
-      setTimeout(() => fire({ particleCount: 60, spread: 120, origin: { x: 0.7, y: 0.5 } }), 900)
 
-      setTimeout(() => setCelebrationFading(true), 3500)
-      setTimeout(() => { setShowCelebration(false); setCelebrationFading(false) }, 4500)
+      timeoutRefs.current = [
+        setTimeout(() => fire({ particleCount: 80, spread: 100, origin: { x: 0.5, y: 0.4 } }), 300),
+        setTimeout(() => fire({ particleCount: 60, spread: 120, origin: { x: 0.3, y: 0.5 } }), 600),
+        setTimeout(() => fire({ particleCount: 60, spread: 120, origin: { x: 0.7, y: 0.5 } }), 900),
+        setTimeout(() => setCelebrationFading(true), 3500),
+        setTimeout(() => { setShowCelebration(false); setCelebrationFading(false) }, 4500),
+      ]
     }
 
     prevStatusRef.current = updatedStatus ?? undefined
@@ -172,13 +167,16 @@ export default function RevealIllustrationPanel({
           "fixed inset-0 z-[9998] flex items-center justify-center backdrop-blur-md bg-black/60",
           celebrationFading ? "animate-out fade-out duration-1000" : "animate-in fade-in duration-700"
         )}>
-          <div className="flex flex-col items-center justify-center gap-6 animate-in fade-in zoom-in duration-1000 text-center px-8">
-            <span className="text-7xl animate-in zoom-in duration-1000">🎉</span>
-            <h1 className="text-5xl md:text-7xl font-bold text-white drop-shadow-[0_4px_24px_rgba(0,0,0,1)] leading-tight tracking-tight">
-              ¡Ecografías reveladas!
+          <div className="flex flex-col items-center justify-center gap-5 animate-in fade-in zoom-in duration-700 text-center px-6 max-w-lg">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/70 text-xs tracking-widest uppercase px-4 py-2 rounded-full">
+              <SparklesIcon className="size-3 text-violet-300" />
+              Mire Reveal
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
+              Your baby has<br />been revealed ✨
             </h1>
-            <p className="text-2xl md:text-3xl text-white/90 drop-shadow-[0_2px_12px_rgba(0,0,0,1)] max-w-xl font-medium leading-relaxed">
-              Una ilusión antes del nacimiento,<br />¡te va a gustar! 💕
+            <p className="text-base md:text-lg text-white/60 max-w-sm leading-relaxed">
+              Tap any image to see the full reveal
             </p>
           </div>
         </div>
@@ -186,8 +184,9 @@ export default function RevealIllustrationPanel({
       <div>
         {(updatedStatus === ILLUSTRATION_STATUS.PROCESSING ||
           updatedStatus === ILLUSTRATION_STATUS.PENDING) && (
-            <p className="inline-flex text-lg items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
-              <span>✨ Revealing images, please wait a moment...</span>
+            <p className="inline-flex items-center gap-2 text-sm text-white/50 px-4 py-2">
+              <span className="size-1.5 rounded-full bg-violet-400 animate-pulse" />
+              Processing your ultrasound...
             </p>
           )}
         {images?.length > 0 && (
@@ -200,7 +199,6 @@ export default function RevealIllustrationPanel({
               <div className="h-full w-full">
                 <MasonryCard
                   data={images[0] as unknown as ImageDataFormat}
-                  onRetry={() => {}}
                   onClick={() => setSelectedImage(images[0] as unknown as ImageDataFormat)}
                   heightClass="w-full h-full"
                 />
@@ -212,7 +210,6 @@ export default function RevealIllustrationPanel({
                   <MasonryCard
                     key={idx}
                     data={img as unknown as ImageDataFormat}
-                    onRetry={() => {}}
                     onClick={() => setSelectedImage(img as unknown as ImageDataFormat)}
                     heightClass="w-full md:w-1/2 h-1/2 md:h-full"
                   />
@@ -223,7 +220,6 @@ export default function RevealIllustrationPanel({
               <div className="flex flex-col md:flex-row gap-3 md:gap-4 h-full">
                 <MasonryCard
                   data={images[0] as unknown as ImageDataFormat}
-                  onRetry={() => {}}
                   onClick={() => setSelectedImage(images[0] as unknown as ImageDataFormat)}
                   heightClass="w-full md:w-1/2 h-[45dvh] md:h-full"
                 />
@@ -232,7 +228,6 @@ export default function RevealIllustrationPanel({
                     <MasonryCard
                       key={idx + 1}
                       data={img as unknown as ImageDataFormat}
-                      onRetry={() => {}}
                       onClick={() => setSelectedImage(img as unknown as ImageDataFormat)}
                       heightClass={cn(
                         "w-full",

@@ -63,6 +63,10 @@ export default function GeneralMenu({ settings, isAdmin }: { settings: GetSettin
 
   return (
     <SidebarProvider>
+      {/* Mobile floating trigger — only visible on small screens */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <SidebarTrigger className="flex items-center justify-center size-12 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white shadow-lg transition-all duration-200" />
+      </div>
       <Sidebar variant="inset" className="dark">
         <SidebarHeader className="">
           <div className="flex flex-col gap-6">

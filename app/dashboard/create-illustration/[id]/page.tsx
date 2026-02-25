@@ -1,5 +1,5 @@
 import RevealIllustrationPanel from "@/components/features/illustration/RevealIllustrationPanel";
-import { EyeIcon } from "lucide-react";
+import { SparklesIcon } from "lucide-react";
 
 export default async function CreateIllustrationPage({
   params,
@@ -9,22 +9,17 @@ export default async function CreateIllustrationPage({
     const { id } = await params;
 
     return (
-        <div className={`flex justify-center items-center py-5 px-[10%]`}>
-          <div className={`grid w-full`}>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center">
-                <p className="font-bold text-lg">
-                  <EyeIcon className="size-6" />
-                  Reveal hyper-realistic ultrasound
-                </p>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Reveal your created hyper-realistic ultrasound. Once generation is complete, you can view it and share it with your friends and family.
-              </p>
-            </div>
-            <div className="pt-6 w-full">
-              <RevealIllustrationPanel illustrationId={id} />
-            </div>
+        <div className="flex flex-col w-full min-h-screen">
+          <div className="px-4 md:px-8 pt-16 pb-2 flex flex-col gap-1">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight mt-2">
+              Your ultrasound reveal
+            </h1>
+            <p className="text-muted-foreground text-sm max-w-md">
+              Tap any image to see the full reveal, compare with the original, or watch the transition video.
+            </p>
+          </div>
+          <div className="flex-1 w-full">
+            <RevealIllustrationPanel illustrationId={id} />
           </div>
         </div>
     )
