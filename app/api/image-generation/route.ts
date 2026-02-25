@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIllustrationById, IllustrationResponse } from "@/actions/illustrations";
 import { ILLUSTRATION_STATUS, ImageDataFormat } from "@/models/illustration.model";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
 import { supabaseServer } from "@/lib/supabase/server";
 import { Json } from "@/lib/supabase/types";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -41,17 +44,53 @@ export async function insertModelHistory({ usageMetadata, illustrationId, imageI
     }
 }
 
+async function applyWatermark(base64Image: string): Promise<Buffer> {
+    const inputBuffer = Buffer.from(base64Image, "base64");
+    const { width = 1024, height = 1024 } = await sharp(inputBuffer).metadata();
+
+    const logoSize = Math.round(Math.min(width, height) * 0.18);
+    const margin = Math.round(Math.min(width, height) * 0.04);
+
+    const svgLogo = `
+        <svg width="${logoSize}" height="${logoSize}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" opacity="0.45">
+            <circle cx="50" cy="50" r="44" fill="none" stroke="white" stroke-width="6" />
+            <text x="50" y="57" font-family="Georgia, serif" font-size="28" font-weight="bold"
+                fill="white" text-anchor="middle" letter-spacing="2">MIRE</text>
+            <line x1="18" y1="67" x2="82" y2="67" stroke="white" stroke-width="2" />
+            <text x="50" y="80" font-family="Georgia, serif" font-size="11"
+                fill="white" text-anchor="middle" letter-spacing="3">REVEAL</text>
+        </svg>`;
+
+    const logoBuffer = await sharp(Buffer.from(svgLogo))
+        .resize(logoSize, logoSize)
+        .png()
+        .toBuffer();
+
+    return sharp(inputBuffer)
+        .composite([{
+            input: logoBuffer,
+            gravity: "southeast",
+            blend: "over",
+            left: width - logoSize - margin,
+            top: height - logoSize - margin,
+        }])
+        .withMetadata()
+        .jpeg({ quality: 92 })
+        .toBuffer();
+}
+
 const setIllustrationIntoStorage = async ({ illustrationId, imageId, processedImageBase64 }: { illustrationId: number, imageId: string, processedImageBase64: string }): Promise<{ path: string, fullPath: string, publicUrl: string }> => {
     const supabase = await supabaseServer();
+
+    const watermarkedBuffer = await applyWatermark(processedImageBase64);
 
     const imageName = `${illustrationId}-${imageId}-${Date.now()}.jpg`;
     const { data: dataStorage, error } = await supabase.storage
         .from(PROCESSED_IMAGES_BUCKET)
-        .upload(imageName, Buffer.from(processedImageBase64, "base64"), {
+        .upload(imageName, watermarkedBuffer, {
             contentType: IMAGE_MIMETYPE,
             upsert: false,
         });
-
 
     if (!dataStorage?.path || error) {
         console.log("Error uploading image:", error);
@@ -164,13 +203,25 @@ export async function processImageWithGemini({ illustrationId, imageId, imagePat
             throw new Error("Image not found");
         }
 
-        // Prompt to transform ultrasound to artistic baby illustration
-        const prompt = `Generate a photorealistic reconstruction strictly based on this 3D fetal ultrasound image.
-        Preserve 100% of the original anatomy, facial structure, proportions, and exact fetal pose, exact nose, exact lips. Do not modify position, expression, angle, or orientation in any way.
-        The output must look like a realistic ${gestationalWeek} week gestational age baby, medically accurate and developmentally consistent.
-        Maintain natural ${ethnicity} ethnic traits without exaggeration and gender ${gender} .
-        NON NEGOTIABLE: The baby skin tone must be like a newborn baby with white skin tone(depending on the ethnicity ${ethnicity}), baby eyes are closed always.
-        No artistic interpretation, no beautification, no stylization — only a realistic enhancement of the original scan into true-to-life photographic detail.`;
+     
+        // PROMPT FORMULA = [action/change] + [specific element to change] + [desired style/effect] + [relevant details]
+        // ACTION WORDS = Add, Change, Make, Remove, Replace
+        const editingImagePrompt = `
+        Task: High-fidelity photographic skin-render of a 3D fetal ultrasound scan.
+        Input Constraints: Use the provided 3D ultrasound image as the absolute structural template. You must map a realistic photographic texture onto the exact morphology of the scan.
+        Anatomical Fidelity (Strict):
+        Zero Alteration: Maintain the exact bulbousness of the nose, the specific thickness and curve of the lips, and the unique jawline shown in the scan.
+        Pose: Do not change the tilt of the head or the position of the hands. If a hand is near the face, it must remain exactly there.
+        Eyes: Must remain tightly closed with realistic eyelid creases, consistent with a fetus in the womb.
+        Medical Realism:
+        Developmental Accuracy: The baby must look like a ${gestationalWeek}-week fetus. Adjust skin texture to reflect this age (slight vernix or translucent quality if applicable).
+        Demographics: Natural ${ethnicity} skin tones and ${gender} features.
+        Skin Texture: Avoid "porcelain" or "perfect" skin. Use realistic newborn skin textures: subtle mottling, fine pores, and natural skin folds.
+        Aesthetic Style: > * Lighting: Soft, diffused womb-like lighting (warm tones, cinematic subsurface scattering).
+        Eliminate: No artistic smoothing, no "AI-beautification", no stock-photo face.
+        Remove: No interpretable body parts.
+        Output: A raw, hyper-realistic photographic reconstruction that looks like a real photo of the fetus from the scan.
+        `;
 
         // Correct multimodal Gemini request
         const result = await model.generateContent({
@@ -178,7 +229,7 @@ export async function processImageWithGemini({ illustrationId, imageId, imagePat
                 {
                     role: "user",
                     parts: [
-                        { text: prompt },
+                        { text: editingImagePrompt },
                         {
                             inlineData: {
                                 data: base64Image,

@@ -3,9 +3,12 @@
 import { ImageDataFormat } from '@/models/illustration.model'
 import { XIcon } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
+import { Player, PlayerRef } from '@remotion/player'
+import { RotateCcwIcon } from 'lucide-react'
 import UltrasoundTabs, { UltrasoundTab } from './UltrasoundTabs'
+import UltrasoundRevealComposition from './UltrasoundRevealComposition'
 
 export default function UltrasoundViewer({
   image,
@@ -15,6 +18,8 @@ export default function UltrasoundViewer({
   onClose: () => void
 }) {
   const [activeTab, setActiveTab] = useState<UltrasoundTab>('reveal')
+  const [videoEnded, setVideoEnded] = useState(false)
+  const playerRef = useRef<PlayerRef>(null)
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -24,17 +29,31 @@ export default function UltrasoundViewer({
     return () => document.removeEventListener('keydown', handleKey)
   }, [onClose])
 
+  useEffect(() => {
+    const player = playerRef.current
+    if (!player) return
+    const onEnded = () => setVideoEnded(true)
+    player.addEventListener('ended', onEnded)
+    return () => player.removeEventListener('ended', onEnded)
+  }, [])
+
+  const handleReplay = () => {
+    setVideoEnded(false)
+    playerRef.current?.seekTo(0)
+    playerRef.current?.play()
+  }
+
   const processedUrl = image.images.processed.publicUrl
   const originalUrl = image.images.unprocessed.publicUrl
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-black animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-8 py-4 shrink-0">
+      <div className="relative flex items-center justify-center px-4 md:px-8 py-4 shrink-0">
         <UltrasoundTabs activeTab={activeTab} onTabChange={setActiveTab} />
         <button
           onClick={onClose}
-          className="flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all duration-200 backdrop-blur-sm"
+          className="absolute right-4 md:right-8 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all duration-200 backdrop-blur-sm"
         >
           <XIcon className="size-5" />
         </button>
@@ -43,14 +62,49 @@ export default function UltrasoundViewer({
       {/* Content */}
       <div className="relative flex-1 w-full overflow-hidden">
         {activeTab === 'reveal' && (
-          <Image
-            src={processedUrl}
-            alt="Ecografía hiperrealista"
-            fill
-            priority
-            sizes="100vw"
-            className="object-contain"
-          />
+          <div className="relative w-full h-full flex items-center justify-center bg-black">
+            {/* Sized wrapper — 100vw square on mobile, capped by vh on desktop */}
+            <div
+              style={{
+                width: 'min(100vw, 100vh)',
+                height: 'min(100vw, 100vh)',
+                display: videoEnded ? 'none' : 'block',
+                flexShrink: 0,
+              }}
+            >
+              <Player
+                ref={playerRef}
+                component={UltrasoundRevealComposition}
+                inputProps={{ originalUrl, processedUrl }}
+                durationInFrames={150}
+                compositionWidth={1080}
+                compositionHeight={1080}
+                fps={30}
+                style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
+                autoPlay
+              />
+            </div>
+            {/* Static processed image shown once video ends */}
+            {videoEnded && (
+              <>
+                <Image
+                  src={processedUrl}
+                  alt="Ecografía hiperrealista"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-contain"
+                />
+                <button
+                  onClick={handleReplay}
+                  className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-all animate-in fade-in zoom-in duration-500"
+                >
+                  <RotateCcwIcon className="size-4" />
+                  Reproducir de nuevo
+                </button>
+              </>
+            )}
+          </div>
         )}
 
         {activeTab === 'original' && (
